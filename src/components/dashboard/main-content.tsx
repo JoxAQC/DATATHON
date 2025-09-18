@@ -13,9 +13,7 @@ interface MainContentProps {
   crimeData: CrimeDataPoint[];
   genderViolenceData: GenderViolenceData[];
   trustData: TrustData[];
-  onSelectRegion: (region: Region) => void;
-  mapCenter: { lat: number; lng: number };
-  mapZoom: number;
+  onSelectRegion: (region: Region | null) => void;
 }
 
 export default function MainContent({
@@ -24,8 +22,6 @@ export default function MainContent({
   genderViolenceData,
   trustData,
   onSelectRegion,
-  mapCenter,
-  mapZoom
 }: MainContentProps) {
   return (
     <main className="flex-1 p-6 bg-background/80">
@@ -33,25 +29,22 @@ export default function MainContent({
         <TabsList className="bg-card shadow-sm">
           <TabsTrigger value="map" className="font-headline text-lg">
             <Map className="mr-2 h-5 w-5" />
-            Interactive Crime Map
+            Mapa de Regiones
           </TabsTrigger>
           <TabsTrigger value="gender-violence" className="font-headline text-lg">
             <BarChart className="mr-2 h-5 w-5" />
-            Gender Violence
+            Violencia de Género
           </TabsTrigger>
           <TabsTrigger value="trust" className="font-headline text-lg">
             <Shield className="mr-2 h-5 w-5" />
-            Public Trust
+            Confianza Pública
           </TabsTrigger>
         </TabsList>
         <TabsContent value="map" className="flex-1 mt-4">
-          <Card className="h-full w-full overflow-hidden">
+          <Card className="h-full w-full overflow-auto p-4">
              <CrimeMapWrapper
                 regions={regions}
-                crimeData={crimeData}
                 onSelectRegion={onSelectRegion}
-                center={mapCenter}
-                zoom={mapZoom}
             />
           </Card>
         </TabsContent>

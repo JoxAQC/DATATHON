@@ -21,18 +21,11 @@ export default function CrimeDashboard({
 }: CrimeDashboardProps) {
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [selectedCrimeType, setSelectedCrimeType] = useState<CrimeType | 'All'>('All');
-  const [mapCenter, setMapCenter] = useState({ lat: -9.19, lng: -75.0152 }); // Centered on Peru
-  const [mapZoom, setMapZoom] = useState(5);
-
+  
   const handleSelectRegion = (region: Region | null) => {
     setSelectedRegion(region);
     if (region) {
-      setMapCenter({ lat: region.lat, lng: region.lng });
-      setMapZoom(region.zoom);
       setSelectedCrimeType('All');
-    } else {
-      setMapCenter({ lat: -9.19, lng: -75.0152 });
-      setMapZoom(5);
     }
   };
 
@@ -80,8 +73,6 @@ export default function CrimeDashboard({
         genderViolenceData={genderViolenceData}
         trustData={trustData}
         onSelectRegion={handleSelectRegion}
-        mapCenter={mapCenter}
-        mapZoom={mapZoom}
       />
       <Chatbot />
     </div>
