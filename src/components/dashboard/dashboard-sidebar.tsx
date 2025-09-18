@@ -69,7 +69,7 @@ export default function DashboardSidebar({
 
 
   return (
-    <aside className="w-[350px] flex-shrink-0 border-r bg-card p-4 flex flex-col shadow-lg z-10">
+    <aside className="w-[350px] flex-shrink-0 border-r bg-card p-4 flex flex-col shadow-lg z-10 comic-panel">
       <header>
         <h1 className="font-headline text-4xl text-primary">¿CÓMO VAMOS?</h1>
         <p className="text-muted-foreground -mt-2">Crime Comic Dashboard</p>
@@ -126,7 +126,7 @@ export default function DashboardSidebar({
               <Button
                 key={crime}
                 variant={isActive ? 'default' : 'outline'}
-                className="h-auto flex flex-col items-center p-2 gap-1 text-center"
+                className="h-auto flex flex-col items-center p-2 gap-1 text-center comic-panel"
                 onClick={() => onSelectCrimeType(isActive ? 'All' : crime)}
               >
                 {Icon && <Icon className="w-8 h-8" />}
@@ -135,7 +135,7 @@ export default function DashboardSidebar({
             );
           })}
         </div>
-        <Button onClick={onExport} className="w-full">
+        <Button onClick={onExport} className="w-full comic-panel">
           <Download className="mr-2 h-4 w-4" />
           Export Current Data
         </Button>

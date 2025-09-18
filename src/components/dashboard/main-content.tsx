@@ -24,9 +24,9 @@ export default function MainContent({
   onSelectRegion,
 }: MainContentProps) {
   return (
-    <main className="flex-1 p-6 bg-background/80">
+    <main className="flex-1 p-6 bg-transparent">
       <Tabs defaultValue="map" className="h-full w-full flex flex-col">
-        <TabsList className="bg-card shadow-sm">
+        <TabsList className="bg-card comic-panel">
           <TabsTrigger value="map" className="font-headline text-lg">
             <Map className="mr-2 h-5 w-5" />
             Mapa de Regiones
@@ -41,7 +41,7 @@ export default function MainContent({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="map" className="flex-1 mt-4">
-          <Card className="h-full w-full overflow-auto p-4">
+          <Card className="h-full w-full overflow-auto p-4 comic-panel">
              <CrimeMapWrapper
                 regions={regions}
                 onSelectRegion={onSelectRegion}

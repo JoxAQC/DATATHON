@@ -30,7 +30,7 @@ interface TrustLevelChartProps {
 
 export default function TrustLevelChart({ data }: TrustLevelChartProps) {
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col comic-panel">
       <CardHeader>
         <CardTitle className="font-headline text-primary">Public Trust Measurement</CardTitle>
         <CardDescription>

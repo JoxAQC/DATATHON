@@ -23,7 +23,7 @@ interface GenderViolenceChartProps {
 
 export default function GenderViolenceChart({ data }: GenderViolenceChartProps) {
   return (
-    <Card className="h-full flex flex-col">
+    <Card className="h-full flex flex-col comic-panel">
       <CardHeader>
         <CardTitle className="font-headline text-primary">Gender Violence Insights</CardTitle>
         <CardDescription>Reported femicide cases in Peru (2019-2023).</CardDescription>

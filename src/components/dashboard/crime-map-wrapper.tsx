@@ -30,7 +30,7 @@ export default function CrimeMapWrapper({ regions, onSelectRegion }: RegionGridP
         <div
           key={region.id}
           onClick={() => onSelectRegion(region.id === 'all' ? null : region)}
-          className="bg-card border border-border rounded-lg flex items-center justify-center text-center p-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors aspect-video"
+          className="bg-card border-border rounded-lg flex items-center justify-center text-center p-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors aspect-video comic-panel"
         >
           <span className="text-sm font-semibold">{region.name}</span>
         </div>
