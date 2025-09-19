@@ -1,7 +1,6 @@
 "use client";
 
 import type { Region } from "@/lib/types";
-import { Card, CardContent } from "@/components/ui/card";
 import { useMemo } from "react";
 
 interface RegionGridProps {
@@ -10,6 +9,10 @@ interface RegionGridProps {
   selectedRegion: Region | null;
   viewType: 'crimes' | 'heroes';
 }
+
+const removeAccents = (str: string) => {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
 
 export default function CrimeMapWrapper({ regions, onSelectRegion, selectedRegion, viewType }: RegionGridProps) {
   
@@ -30,14 +33,11 @@ export default function CrimeMapWrapper({ regions, onSelectRegion, selectedRegio
   const displayRegions = [allRegionsOption, ...regions];
 
   const maxCount = useMemo(() => {
-    if (viewType === 'heroes') {
-      return Math.max(...regions.map(r => r.count), 0);
-    }
-    return 0; // Not used for crimes view
-  }, [regions, viewType]);
+    return Math.max(...regions.map(r => r.count), 0);
+  }, [regions]);
 
-  const getHeroCircleStyle = (count: number) => {
-    if (viewType !== 'heroes' || maxCount === 0) return {};
+  const getCircleStyle = (count: number) => {
+    if (maxCount === 0) return {};
     const percentage = (count / maxCount) * 100;
     const size = 20 + (percentage / 100) * 40; // min size 20px, max 60px
     return {
@@ -55,16 +55,16 @@ export default function CrimeMapWrapper({ regions, onSelectRegion, selectedRegio
           className={`bg-card border-border rounded-lg flex flex-col items-center justify-center text-center p-2 cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors aspect-video comic-panel ${selectedRegion?.id === region.id ? 'bg-primary text-primary-foreground' : ''}`}
         >
           <span className="text-sm font-semibold">{region.name}</span>
-          {viewType === 'heroes' ? (
+           {region.id !== 'all' && region.count > 0 ? (
             <div 
-              className="bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm mt-2"
-              style={getHeroCircleStyle(region.count)}
+              className={`rounded-full flex items-center justify-center text-white font-bold text-sm mt-2 ${viewType === 'heroes' ? 'bg-green-500' : 'bg-red-500'}`}
+              style={getCircleStyle(region.count)}
             >
               {region.count.toLocaleString()}
             </div>
-          ) : (
+           ) : (
             <span className="text-xl font-bold font-headline">{region.count.toLocaleString()}</span>
-          )}
+           )}
         </div>
       ))}
     </div>
