@@ -3,7 +3,7 @@ import { genderViolenceData, trustData } from '@/lib/data';
 
 export default function Home() {
   return (
-    <main>
+    <main className="overflow-hidden">
       <CrimeDashboard
         genderViolenceData={genderViolenceData}
         trustData={trustData}

@@ -7,6 +7,9 @@ import MainContent from './main-content';
 import Chatbot from './chatbot';
 import { crimeDataByYear, allCrimeData, regions as allRegions } from '@/lib/data';
 import heroesData from '@/lib/heroes.json';
+import { Map, ShieldCheck, BarChart, Shield } from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
+import { cn } from '@/lib/utils';
 
 interface CrimeDashboardProps {
   genderViolenceData: GenderViolenceData[];
@@ -15,6 +18,7 @@ interface CrimeDashboardProps {
 
 // Helper function to remove accents
 const removeAccents = (str: string) => {
+  if (!str) return '';
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 };
 
@@ -24,6 +28,7 @@ export default function CrimeDashboard({
 }: CrimeDashboardProps) {
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [selectedCrimeType, setSelectedCrimeType] = useState<CrimeType | 'All'>('All');
+  const [activeTab, setActiveTab] = useState('map');
   
   const handleSelectRegion = (region: Region | null) => {
     setSelectedRegion(region);
@@ -33,7 +38,12 @@ export default function CrimeDashboard({
     setSelectedCrimeType(crimeType);
   };
   
-  const latestYear = useMemo(() => Object.keys(crimeDataByYear).sort((a, b) => b.localeCompare(a)).pop() || new Date().getFullYear().toString(), []);
+  const latestYear = useMemo(() => {
+    const years = Object.keys(crimeDataByYear);
+    if (years.length === 0) return new Date().getFullYear().toString();
+    return years.sort((a, b) => b.localeCompare(a))[0];
+  }, []);
+
 
   const crimeDataForMap = useMemo(() => {
     const dataForYear = crimeDataByYear[latestYear]?.total_crimes_by_location || [];
@@ -58,7 +68,7 @@ export default function CrimeDashboard({
         count,
       };
     });
-  }, [selectedCrimeType, latestYear]);
+  }, [selectedCrimeType, latestYear, allCrimeData]);
 
   const heroesDataForMap = useMemo(() => {
     const heroesByRegion = heroesData.police_by_location.reduce((acc, hero) => {
@@ -98,7 +108,38 @@ export default function CrimeDashboard({
   const mostCommonCrimesInView = selectedRegion ? selectedRegion.mostCommonCrimes : ['Aggravated Robbery', 'Homicide', 'Assault', 'Extortion'];
 
   return (
-    <div className="flex h-screen w-full bg-background font-body">
+    <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="flex h-screen w-full bg-background font-body">
+      <aside className="w-24 flex-shrink-0 bg-card p-4 flex flex-col items-center justify-center z-20 comic-panel">
+         <TabsList className="bg-transparent flex-col gap-4 h-full">
+            <TabsTrigger value="map" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
+                <Map className="mb-1 h-7 w-7" />
+                <span>Mapa</span>
+            </TabsTrigger>
+            <TabsTrigger value="heroes" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
+                <ShieldCheck className="mb-1 h-7 w-7" />
+                <span>Héroes</span>
+            </TabsTrigger>
+            <TabsTrigger value="gender-violence" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
+                <BarChart className="mb-1 h-7 w-7" />
+                <span>Género</span>
+            </TabsTrigger>
+            <TabsTrigger value="trust" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
+                <Shield className="mb-1 h-7 w-7" />
+                <span>Confianza</span>
+            </TabsTrigger>
+        </TabsList>
+      </aside>
+      
+      <MainContent
+        activeTab={activeTab}
+        crimeRegions={crimeDataForMap}
+        heroesRegions={heroesDataForMap}
+        genderViolenceData={genderViolenceData}
+        trustData={trustData}
+        onSelectRegion={handleSelectRegion}
+        selectedRegion={selectedRegion}
+      />
+      
       <DashboardSidebar
         selectedRegion={selectedRegion}
         onSelectRegion={handleSelectRegion}
@@ -110,15 +151,8 @@ export default function CrimeDashboard({
         crimeDataByYear={crimeDataByYear}
         allCrimeData={allCrimeData}
       />
-      <MainContent
-        crimeRegions={crimeDataForMap}
-        heroesRegions={heroesDataForMap}
-        genderViolenceData={genderViolenceData}
-        trustData={trustData}
-        onSelectRegion={handleSelectRegion}
-        selectedRegion={selectedRegion}
-      />
+      
       <Chatbot />
-    </div>
+    </Tabs>
   );
 }

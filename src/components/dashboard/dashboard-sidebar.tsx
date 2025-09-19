@@ -40,6 +40,7 @@ const iconMap: Record<CrimeType, React.ComponentType<any>> = {
 
 // Helper function to remove accents
 const removeAccents = (str: string) => {
+  if (!str) return '';
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 };
 
@@ -58,7 +59,7 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion }
 
   const locationDetails: CrimeLocationDetail[] = useMemo(() => {
     const normalizedRegionName = removeAccents(region.name).toUpperCase();
-    const latestYear = Object.keys(crimeDataByYear).sort((a, b) => b.localeCompare(a)).pop()!;
+    const latestYear = Object.keys(crimeDataByYear).sort((a, b) => b.localeCompare(a))[0]!;
     const details = allCrimeData
       .filter(d => removeAccents(d.region).toUpperCase() === normalizedRegionName && d.date === latestYear)
       .reduce((acc, crime) => {
@@ -183,7 +184,7 @@ export default function DashboardSidebar({
 
 
   return (
-    <aside className="w-[350px] flex-shrink-0 border-r bg-card p-4 flex flex-col shadow-lg z-10 comic-panel">
+    <aside className="w-[350px] flex-shrink-0 border-l bg-card p-4 flex flex-col shadow-lg z-10 comic-panel">
       <header>
         <h1 className="font-headline text-4xl text-primary">¿CÓMO VAMOS?</h1>
         <p className="text-muted-foreground -mt-2">Crime Comic Dashboard</p>
