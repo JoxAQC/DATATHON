@@ -52,8 +52,6 @@ const processedTrustData: TrustData[] = confianzaJson.visualizaciones['PORCENTAJ
     region: item.departamento,
     year: item.periodo
 }));
-// Assuming 'Perception of Insecurity' is static for now, as it's not in confianza.json
-processedTrustData.push({ name: 'Perception of Insecurity', value: 82, region: 'NACIONAL', year: 2021 });
 
 export const trustData: TrustData[] = processedTrustData;
 

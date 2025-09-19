@@ -63,18 +63,22 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, 
   const locationDetails: CrimeLocationDetail[] = useMemo(() => {
     const normalizedRegionName = removeAccents(region.name).toUpperCase();
     const latestYear = Object.keys(crimeDataByYear).sort((a, b) => b.localeCompare(a))[0]!;
-    const details = allCrimeData
-      .filter(d => removeAccents(d.region).toUpperCase() === normalizedRegionName && d.date === latestYear)
+    
+    const latestYearCrimes = crimeDataByYear[latestYear].crimes_by_type_and_location;
+
+    const details = latestYearCrimes
+      .filter(crime => removeAccents(crime.dpto_pjfs).toUpperCase() === normalizedRegionName)
       .reduce((acc, crime) => {
-        const key = `${crime.province}-${crime.district}`;
+        const key = `${crime.prov_pjfs}-${crime.dist_pjfs}`;
         if (!acc[key]) {
-          acc[key] = { province: crime.province, district: crime.district, count: 0 };
+          acc[key] = { province: crime.prov_pjfs, district: crime.dist_pjfs, count: 0 };
         }
-        acc[key].count += crime.count;
+        acc[key].count += crime.cantidad;
         return acc;
       }, {} as Record<string, CrimeLocationDetail>);
+      
     return Object.values(details).sort((a,b) => b.count - a.count);
-  }, [region, allCrimeData, crimeDataByYear]);
+  }, [region, crimeDataByYear]);
 
   const regionWithStats: Region = {
     ...region,
@@ -93,14 +97,8 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, 
         d.name === 'Trust in Police' &&
         d.year === latestYear
     );
-
-    const perceptionData = trustData.find(d => d.name === 'Perception of Insecurity');
-
-    const data: TrustData[] = [];
-    if(perceptionData) data.push(perceptionData); // National perception
-    if(trustInPoliceData) data.push(trustInPoliceData);
     
-    return data;
+    return trustInPoliceData ? [trustInPoliceData] : [];
   }, [region, trustData]);
 
   return (
@@ -113,10 +111,7 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, 
       </div>
       <ScrollArea className="flex-1 pr-3 mt-2">
         <div className="space-y-4">
-          <div>
-            <h3 className="font-headline text-lg text-primary/90">Public Trust</h3>
-            <TrustLevelChart data={regionalTrustData} />
-          </div>
+          
           <div>
             <h3 className="font-headline text-lg text-primary/90">Historical Crime Trend</h3>
             <Card className="h-48 w-full p-2 comic-panel">
@@ -168,6 +163,11 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, 
                 </CardContent>
              </Card>
           </div>
+
+          <div>
+            <h3 className="font-headline text-lg text-primary/90">Public Trust</h3>
+            <TrustLevelChart data={regionalTrustData} />
+          </div>
         </div>
       </ScrollArea>
     </div>
@@ -212,13 +212,11 @@ export default function DashboardSidebar({
   };
   
   const nationalTrustData = useMemo(() => {
-    const perceptionData = trustData.find(d => d.name === 'Perception of Insecurity');
     const latestYearData = trustData.filter(d => d.name === 'Trust in Police').sort((a, b) => b.year - a.year);
     const latestYear = latestYearData.length > 0 ? latestYearData[0].year : new Date().getFullYear();
     const trustInPoliceData = trustData.find(d => d.region === 'NACIONAL' && d.name === 'Trust in Police' && d.year === latestYear);
     
     const data: TrustData[] = [];
-    if(perceptionData) data.push(perceptionData);
     if(trustInPoliceData) data.push(trustInPoliceData);
 
     return data;
@@ -292,5 +290,3 @@ export default function DashboardSidebar({
     </aside>
   );
 }
-
-    
