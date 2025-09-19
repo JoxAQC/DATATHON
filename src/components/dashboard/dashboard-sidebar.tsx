@@ -38,11 +38,17 @@ const iconMap: Record<CrimeType, React.ComponentType<any>> = {
   'Extortion': ExtortionIcon,
 };
 
+// Helper function to remove accents
+const removeAccents = (str: string) => {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
 function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion }: { region: Region, crimeDataByYear: DashboardSidebarProps['crimeDataByYear'], allCrimeData: CrimeDataPoint[], onSelectRegion: (region: Region | null) => void }) {
   const historicalData = useMemo(() => {
+    const normalizedRegionName = removeAccents(region.name).toUpperCase();
     return Object.keys(crimeDataByYear).map(year => {
       const yearData = crimeDataByYear[year].total_crimes_by_location;
-      const regionData = yearData.find(d => d.dpto_pjfs === region.name);
+      const regionData = yearData.find(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
       return {
         year: year,
         crimes: regionData ? regionData.cantidad : 0,
@@ -51,9 +57,10 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion }
   }, [region, crimeDataByYear]);
 
   const locationDetails: CrimeLocationDetail[] = useMemo(() => {
-    const latestYear = Object.keys(crimeDataByYear).sort().pop()!;
+    const normalizedRegionName = removeAccents(region.name).toUpperCase();
+    const latestYear = Object.keys(crimeDataByYear).sort((a, b) => b.localeCompare(a)).pop()!;
     const details = allCrimeData
-      .filter(d => d.region === region.name && d.date === latestYear)
+      .filter(d => removeAccents(d.region).toUpperCase() === normalizedRegionName && d.date === latestYear)
       .reduce((acc, crime) => {
         const key = `${crime.province}-${crime.district}`;
         if (!acc[key]) {

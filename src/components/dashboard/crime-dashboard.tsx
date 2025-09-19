@@ -6,11 +6,17 @@ import DashboardSidebar from './dashboard-sidebar';
 import MainContent from './main-content';
 import Chatbot from './chatbot';
 import { crimeDataByYear, allCrimeData, regions as allRegions } from '@/lib/data';
+import heroesData from '@/lib/heroes.json';
 
 interface CrimeDashboardProps {
   genderViolenceData: GenderViolenceData[];
   trustData: TrustData[];
 }
+
+// Helper function to remove accents
+const removeAccents = (str: string) => {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
 
 export default function CrimeDashboard({
   genderViolenceData,
@@ -27,20 +33,21 @@ export default function CrimeDashboard({
     setSelectedCrimeType(crimeType);
   };
   
-  const latestYear = useMemo(() => Object.keys(crimeDataByYear).sort().pop() || new Date().getFullYear().toString(), []);
+  const latestYear = useMemo(() => Object.keys(crimeDataByYear).sort((a, b) => b.localeCompare(a)).pop() || new Date().getFullYear().toString(), []);
 
   const crimeDataForMap = useMemo(() => {
     const dataForYear = crimeDataByYear[latestYear]?.total_crimes_by_location || [];
-    const crimeTypeData = crimeDataByYear[latestYear]?.crimes_by_type_and_location || [];
     
     return allRegions.map(region => {
       let count = 0;
+      const normalizedRegionName = removeAccents(region.name).toUpperCase();
+      
       if (selectedCrimeType === 'All') {
-        const regionData = dataForYear.find(d => d.dpto_pjfs === region.name);
+        const regionData = dataForYear.find(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
         count = regionData ? regionData.cantidad : 0;
       } else {
         const regionCrimes = allCrimeData.filter(d => 
-            d.region === region.name && 
+            removeAccents(d.region).toUpperCase() === normalizedRegionName && 
             d.type === selectedCrimeType &&
             d.date === latestYear
         );
@@ -52,6 +59,27 @@ export default function CrimeDashboard({
       };
     });
   }, [selectedCrimeType, latestYear]);
+
+  const heroesDataForMap = useMemo(() => {
+    const heroesByRegion = heroesData.police_by_location.reduce((acc, hero) => {
+      const regionName = removeAccents(hero.departamento).toUpperCase();
+      if (!acc[regionName]) {
+        acc[regionName] = 0;
+      }
+      acc[regionName] += hero.cantidad;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return allRegions.map(region => {
+      const normalizedRegionName = removeAccents(region.name).toUpperCase();
+      const count = heroesByRegion[normalizedRegionName] || 0;
+      return {
+        ...region,
+        count,
+      };
+    });
+  }, []);
+
 
   const handleExportData = () => {
     const dataStr = JSON.stringify({
@@ -83,7 +111,8 @@ export default function CrimeDashboard({
         allCrimeData={allCrimeData}
       />
       <MainContent
-        regions={crimeDataForMap}
+        crimeRegions={crimeDataForMap}
+        heroesRegions={heroesDataForMap}
         genderViolenceData={genderViolenceData}
         trustData={trustData}
         onSelectRegion={handleSelectRegion}

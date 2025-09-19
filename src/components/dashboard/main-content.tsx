@@ -2,14 +2,15 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Region, GenderViolenceData, TrustData } from '@/lib/types';
-import { Map, BarChart, Shield } from "lucide-react";
+import { Map, BarChart, Shield, ShieldCheck } from "lucide-react";
 import CrimeMapWrapper from "./crime-map-wrapper";
 import GenderViolenceChart from "./gender-violence-chart";
 import TrustLevelChart from "./trust-level-chart";
 import { Card } from "../ui/card";
 
 interface MainContentProps {
-  regions: (Region & { count: number })[];
+  crimeRegions: (Region & { count: number })[];
+  heroesRegions: (Region & { count: number })[];
   genderViolenceData: GenderViolenceData[];
   trustData: TrustData[];
   onSelectRegion: (region: Region | null) => void;
@@ -17,7 +18,8 @@ interface MainContentProps {
 }
 
 export default function MainContent({
-  regions,
+  crimeRegions,
+  heroesRegions,
   genderViolenceData,
   trustData,
   onSelectRegion,
@@ -29,7 +31,11 @@ export default function MainContent({
         <TabsList className="bg-card comic-panel">
           <TabsTrigger value="map" className="font-headline text-lg">
             <Map className="mr-2 h-5 w-5" />
-            Mapa de Regiones
+            Mapa de Crímenes
+          </TabsTrigger>
+          <TabsTrigger value="heroes" className="font-headline text-lg">
+            <ShieldCheck className="mr-2 h-5 w-5" />
+            Nuestros Héroes
           </TabsTrigger>
           <TabsTrigger value="gender-violence" className="font-headline text-lg">
             <BarChart className="mr-2 h-5 w-5" />
@@ -43,9 +49,20 @@ export default function MainContent({
         <TabsContent value="map" className="flex-1 mt-4">
           <Card className="h-full w-full overflow-auto p-4 comic-panel">
              <CrimeMapWrapper
-                regions={regions}
+                regions={crimeRegions}
                 onSelectRegion={onSelectRegion}
                 selectedRegion={selectedRegion}
+                viewType="crimes"
+            />
+          </Card>
+        </TabsContent>
+         <TabsContent value="heroes" className="flex-1 mt-4">
+          <Card className="h-full w-full overflow-auto p-4 comic-panel">
+             <CrimeMapWrapper
+                regions={heroesRegions}
+                onSelectRegion={onSelectRegion}
+                selectedRegion={selectedRegion}
+                viewType="heroes"
             />
           </Card>
         </TabsContent>
