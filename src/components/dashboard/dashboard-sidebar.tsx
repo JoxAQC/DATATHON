@@ -38,7 +38,7 @@ const iconMap: Record<CrimeType, React.ComponentType<any>> = {
   'Extortion': ExtortionIcon,
 };
 
-function RegionDetails({ region, crimeDataByYear, allCrimeData }: { region: Region, crimeDataByYear: DashboardSidebarProps['crimeDataByYear'], allCrimeData: CrimeDataPoint[] }) {
+function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion }: { region: Region, crimeDataByYear: DashboardSidebarProps['crimeDataByYear'], allCrimeData: CrimeDataPoint[], onSelectRegion: (region: Region | null) => void }) {
   const historicalData = useMemo(() => {
     return Object.keys(crimeDataByYear).map(year => {
       const yearData = crimeDataByYear[year].total_crimes_by_location;
@@ -197,22 +197,12 @@ export default function DashboardSidebar({
 
       <div className="mt-6 flex-1 flex flex-col min-h-0">
         {selectedRegion ? (
-          <RegionDetails region={selectedRegion} crimeDataByYear={crimeDataByYear} allCrimeData={allCrimeData} />
+          <RegionDetails region={selectedRegion} crimeDataByYear={crimeDataByYear} allCrimeData={allCrimeData} onSelectRegion={onSelectRegion} />
         ) : (
-          <>
+          <div className="flex-1 flex flex-col justify-center items-center text-center">
             <h2 className="font-headline text-2xl text-primary">Global View</h2>
-            <p className="text-muted-foreground text-sm mb-4">Click a region on the map for details or filter by crime type below.</p>
-            <h3 className="font-headline text-xl text-primary/80">All Regions</h3>
-            <ScrollArea className="flex-1 pr-3">
-              <div className="space-y-1">
-                {allRegions.map(region => (
-                  <Button key={region.id} variant="ghost" className="w-full justify-start text-left h-auto py-2" onClick={() => onSelectRegion(region)}>
-                    {region.name}
-                  </Button>
-                ))}
-              </div>
-            </ScrollArea>
-          </>
+            <p className="text-muted-foreground text-sm max-w-xs">Click a region on the map for details or use the filters below to explore crime data across Peru.</p>
+          </div>
         )}
       </div>
 
