@@ -33,6 +33,8 @@ export interface GenderViolenceData {
 export interface TrustData {
   name: 'Perception of Insecurity' | 'Trust in Police';
   value: number;
+  region?: string;
+  year: number;
 }
 
 export interface ChatMessage {

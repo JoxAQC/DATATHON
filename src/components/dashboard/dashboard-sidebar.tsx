@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import type { Region, CrimeType, CrimeDataPoint, CrimeLocationDetail } from '@/lib/types';
+import type { Region, CrimeType, CrimeDataPoint, CrimeLocationDetail, TrustData } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Download, Search, X } from 'lucide-react';
@@ -18,6 +18,7 @@ import { CRIME_TYPES } from '@/lib/types';
 import { ScrollArea } from '../ui/scroll-area';
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '../ui/chart';
+import TrustLevelChart from './trust-level-chart';
 
 interface DashboardSidebarProps {
   selectedRegion: Region | null;
@@ -29,6 +30,7 @@ interface DashboardSidebarProps {
   allRegions: Region[];
   crimeDataByYear: Record<string, { total_crimes_by_location: any[], crimes_by_type_and_location: any[] }>;
   allCrimeData: CrimeDataPoint[];
+  trustData: TrustData[];
 }
 
 const iconMap: Record<CrimeType, React.ComponentType<any>> = {
@@ -44,15 +46,16 @@ const removeAccents = (str: string) => {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 };
 
-function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion }: { region: Region, crimeDataByYear: DashboardSidebarProps['crimeDataByYear'], allCrimeData: CrimeDataPoint[], onSelectRegion: (region: Region | null) => void }) {
+function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, trustData }: { region: Region, crimeDataByYear: DashboardSidebarProps['crimeDataByYear'], allCrimeData: CrimeDataPoint[], onSelectRegion: (region: Region | null) => void, trustData: TrustData[] }) {
   const historicalData = useMemo(() => {
     const normalizedRegionName = removeAccents(region.name).toUpperCase();
     return Object.keys(crimeDataByYear).map(year => {
       const yearData = crimeDataByYear[year].total_crimes_by_location;
-      const regionData = yearData.find(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
+      const regionData = yearData.filter(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
+      const totalCrimes = regionData.reduce((acc, current) => acc + current.cantidad, 0);
       return {
         year: year,
-        crimes: regionData ? regionData.cantidad : 0,
+        crimes: totalCrimes,
       };
     }).sort((a,b) => a.year.localeCompare(b.year));
   }, [region, crimeDataByYear]);
@@ -79,6 +82,18 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion }
     crimeTrends: `In ${historicalData[historicalData.length-1]?.year}, there were ${historicalData[historicalData.length-1]?.crimes.toLocaleString()} crimes.`
   }
 
+  const regionalTrustData = useMemo(() => {
+    const normalizedRegionName = removeAccents(region.name).toUpperCase();
+    const perceptionData = trustData.find(d => d.name === 'Perception of Insecurity');
+    const trustInPoliceData = trustData.find(d => removeAccents(d.region || "").toUpperCase() === normalizedRegionName && d.name === 'Trust in Police');
+
+    const data: TrustData[] = [];
+    if(perceptionData) data.push(perceptionData);
+    if(trustInPoliceData) data.push(trustInPoliceData);
+    
+    return data;
+  }, [region, trustData]);
+
   return (
     <div className="flex-1 flex flex-col min-h-0">
       <div className="flex justify-between items-center">
@@ -89,6 +104,10 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion }
       </div>
       <ScrollArea className="flex-1 pr-3 mt-2">
         <div className="space-y-4">
+          <div>
+            <h3 className="font-headline text-lg text-primary/90">Public Trust</h3>
+            <TrustLevelChart data={regionalTrustData} />
+          </div>
           <div>
             <h3 className="font-headline text-lg text-primary/90">Historical Crime Trend</h3>
             <Card className="h-48 w-full p-2 comic-panel">
@@ -155,7 +174,8 @@ export default function DashboardSidebar({
   onExport,
   allRegions,
   crimeDataByYear,
-  allCrimeData
+  allCrimeData,
+  trustData
 }: DashboardSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -181,6 +201,17 @@ export default function DashboardSidebar({
       toast({ variant: "destructive", title: "Search Error", description: result.error });
     }
   };
+  
+  const nationalTrustData = useMemo(() => {
+    const perceptionData = trustData.find(d => d.name === 'Perception of Insecurity');
+    const trustInPoliceData = trustData.find(d => d.region === 'NACIONAL' && d.name === 'Trust in Police');
+    
+    const data: TrustData[] = [];
+    if(perceptionData) data.push(perceptionData);
+    if(trustInPoliceData) data.push(trustInPoliceData);
+
+    return data;
+  }, [trustData]);
 
 
   return (
@@ -205,11 +236,17 @@ export default function DashboardSidebar({
 
       <div className="mt-6 flex-1 flex flex-col min-h-0">
         {selectedRegion ? (
-          <RegionDetails region={selectedRegion} crimeDataByYear={crimeDataByYear} allCrimeData={allCrimeData} onSelectRegion={onSelectRegion} />
+          <RegionDetails region={selectedRegion} crimeDataByYear={crimeDataByYear} allCrimeData={allCrimeData} onSelectRegion={onSelectRegion} trustData={trustData} />
         ) : (
-          <div className="flex-1 flex flex-col justify-center items-center text-center">
-            <h2 className="font-headline text-2xl text-primary">Global View</h2>
-            <p className="text-muted-foreground text-sm max-w-xs">Click a region on the map for details or use the filters below to explore crime data across Peru.</p>
+          <div className="flex-1 flex flex-col justify-center text-center space-y-4">
+            <div>
+              <h2 className="font-headline text-2xl text-primary">Global View</h2>
+              <p className="text-muted-foreground text-sm max-w-xs mx-auto">Click a region on the map for details or use the filters below to explore data across Peru.</p>
+            </div>
+             <div>
+                <h3 className="font-headline text-lg text-primary/90">National Public Trust</h3>
+                <TrustLevelChart data={nationalTrustData} />
+             </div>
           </div>
         )}
       </div>

@@ -7,7 +7,7 @@ interface RegionGridProps {
   regions: (Region & { count: number })[];
   onSelectRegion: (region: Region | null) => void;
   selectedRegion: Region | null;
-  viewType: 'crimes' | 'heroes';
+  viewType: 'crimes' | 'heroes' | 'trust';
 }
 
 const removeAccents = (str: string) => {
@@ -45,6 +45,15 @@ export default function CrimeMapWrapper({ regions, onSelectRegion, selectedRegio
       height: `${size}px`,
     };
   };
+
+  const getCircleColor = () => {
+    switch(viewType) {
+      case 'crimes': return 'bg-red-500';
+      case 'heroes': return 'bg-green-500';
+      case 'trust': return 'bg-blue-500';
+      default: return 'bg-gray-500';
+    }
+  }
   
   return (
     <div className="grid grid-cols-5 gap-4 w-full">
@@ -57,13 +66,15 @@ export default function CrimeMapWrapper({ regions, onSelectRegion, selectedRegio
           <span className="text-sm font-semibold">{region.name}</span>
            {region.id !== 'all' && region.count > 0 ? (
             <div 
-              className={`rounded-full flex items-center justify-center text-white font-bold text-sm mt-2 ${viewType === 'heroes' ? 'bg-green-500' : 'bg-red-500'}`}
+              className={`rounded-full flex items-center justify-center text-white font-bold text-sm mt-2 ${getCircleColor()}`}
               style={getCircleStyle(region.count)}
             >
-              {region.count.toLocaleString()}
+              {viewType === 'trust' ? `${region.count}%` : region.count.toLocaleString()}
             </div>
            ) : (
-            <span className="text-xl font-bold font-headline">{region.count.toLocaleString()}</span>
+             <span className="text-xl font-bold font-headline">
+              {viewType === 'trust' ? (region.id !== 'all' ? `${region.count}%` : `${(totalCount / regions.filter(r => r.count > 0).length).toFixed(1)}%`) : region.count.toLocaleString()}
+            </span>
            )}
         </div>
       ))}

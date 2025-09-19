@@ -1,0 +1,44 @@
+{
+    "titulo_capitulo": "La Batalla por la Confianza",
+    "panel": "El Pulso del País: ¿Estamos Seguros?",
+    "visualizaciones": {
+        "PORCENTAJE DE CONFIANZA EN LA PNP": [
+            { "periodo": 2014, "valor": 18.0, "departamento": "NACIONAL" },
+            { "periodo": 2015, "valor": 19.5, "departamento": "NACIONAL" },
+            { "periodo": 2016, "valor": 22.1, "departamento": "NACIONAL" },
+            { "periodo": 2017, "valor": 25.0, "departamento": "NACIONAL" },
+            { "periodo": 2018, "valor": 23.8, "departamento": "NACIONAL" },
+            { "periodo": 2019, "valor": 27.2, "departamento": "NACIONAL" },
+            { "periodo": 2020, "valor": 30.5, "departamento": "NACIONAL" },
+            { "periodo": 2021, "valor": 35.0, "departamento": "NACIONAL" },
+            { "periodo": 2021, "valor": 25.5, "departamento": "LORETO" },
+            { "periodo": 2021, "valor": 30.1, "departamento": "UCAYALI" },
+            { "periodo": 2021, "valor": 28.4, "departamento": "MADRE DE DIOS" },
+            { "periodo": 2021, "valor": 33.2, "departamento": "PUNO" },
+            { "periodo": 2021, "valor": 36.5, "departamento": "CUSCO" },
+            { "periodo": 2021, "valor": 31.8, "departamento": "APURIMAC" },
+            { "periodo": 2021, "valor": 34.0, "departamento": "AYACUCHO" },
+            { "periodo": 2021, "valor": 29.5, "departamento": "HUANCAVELICA" },
+            { "periodo": 2021, "valor": 40.2, "departamento": "AREQUIPA" },
+            { "periodo": 2021, "valor": 38.7, "departamento": "MOQUEGUA" },
+            { "periodo": 2021, "valor": 39.1, "departamento": "TACNA" },
+            { "periodo": 2021, "valor": 32.6, "departamento": "ICA" },
+            { "periodo": 2021, "valor": 37.8, "departamento": "JUNIN" },
+            { "periodo": 2021, "valor": 31.2, "departamento": "PASCO" },
+            { "periodo": 2021, "valor": 33.5, "departamento": "HUANUCO" },
+            { "periodo": 2021, "valor": 35.4, "departamento": "SAN MARTIN" },
+            { "periodo": 2021, "valor": 29.9, "departamento": "AMAZONAS" },
+            { "periodo": 2021, "valor": 36.8, "departamento": "CAJAMARCA" },
+            { "periodo": 2021, "valor": 28.1, "departamento": "LA LIBERTAD" },
+            { "periodo": 2021, "valor": 38.2, "departamento": "LAMBAYEQUE" },
+            { "periodo": 2021, "valor": 34.9, "departamento": "ANCASH" },
+            { "periodo": 2021, "valor": 26.3, "departamento": "PIURA" },
+            { "periodo": 2021, "valor": 24.8, "departamento": "TUMBES" },
+            { "periodo": 2021, "valor": 30.0, "departamento": "LIMA" },
+             { "periodo": 2021, "valor": 27.0, "departamento": "CALLAO" }
+        ]
+    },
+    "narrativa": {
+        "descripcion": "Cada indicador puede representarse con diferentes estilos gráficos en el frontend. La percepción de inseguridad puede ser una línea ondulante; la confianza en la PNP puede mostrarse como un medidor dinámico; y otros indicadores se integran en la narrativa visual."
+    }
+}

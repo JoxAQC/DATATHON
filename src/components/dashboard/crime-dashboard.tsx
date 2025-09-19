@@ -5,7 +5,7 @@ import type { Region, CrimeDataPoint, GenderViolenceData, TrustData, CrimeType }
 import DashboardSidebar from './dashboard-sidebar';
 import MainContent from './main-content';
 import Chatbot from './chatbot';
-import { crimeDataByYear, allCrimeData, regions as allRegions } from '@/lib/data';
+import { crimeDataByYear, allCrimeData, regions as allRegions, trustData as allTrustData } from '@/lib/data';
 import heroesData from '@/lib/heroes.json';
 import { Map, ShieldCheck, BarChart, Shield } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 
 interface CrimeDashboardProps {
   genderViolenceData: GenderViolenceData[];
-  trustData: TrustData[];
 }
 
 // Helper function to remove accents
@@ -24,7 +23,6 @@ const removeAccents = (str: string) => {
 
 export default function CrimeDashboard({
   genderViolenceData,
-  trustData,
 }: CrimeDashboardProps) {
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [selectedCrimeType, setSelectedCrimeType] = useState<CrimeType | 'All'>('All');
@@ -52,8 +50,9 @@ export default function CrimeDashboard({
       let count = 0;
       const normalizedRegionName = removeAccents(region.name).toUpperCase();
       
+      const regionData = dataForYear.filter(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
+
       if (selectedCrimeType === 'All') {
-        const regionData = dataForYear.filter(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
         count = regionData.reduce((acc, current) => acc + current.cantidad, 0);
       } else {
         const regionCrimes = allCrimeData.filter(d => 
@@ -89,6 +88,29 @@ export default function CrimeDashboard({
       };
     });
   }, []);
+  
+  const trustDataForMap = useMemo(() => {
+    const latestYearData = allTrustData.filter(d => d.name === 'Trust in Police').sort((a, b) => b.year - a.year);
+    const latestYear = latestYearData.length > 0 ? latestYearData[0].year : new Date().getFullYear();
+
+    const trustByRegion = latestYearData.filter(d => d.year === latestYear).reduce((acc, item) => {
+        if(item.region && item.region !== 'NACIONAL'){
+            const regionName = removeAccents(item.region).toUpperCase();
+            acc[regionName] = item.value;
+        }
+        return acc;
+    }, {} as Record<string, number>);
+
+
+    return allRegions.map(region => {
+        const normalizedRegionName = removeAccents(region.name).toUpperCase();
+        const count = trustByRegion[normalizedRegionName] || 0;
+        return {
+            ...region,
+            count,
+        };
+    });
+  }, []);
 
 
   const handleExportData = () => {
@@ -113,7 +135,7 @@ export default function CrimeDashboard({
          <TabsList className="bg-transparent flex-col gap-4 h-full">
             <TabsTrigger value="map" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
                 <Map className="mb-1 h-7 w-7" />
-                <span>Mapa</span>
+                <span>Crímenes</span>
             </TabsTrigger>
             <TabsTrigger value="heroes" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
                 <ShieldCheck className="mb-1 h-7 w-7" />
@@ -134,8 +156,8 @@ export default function CrimeDashboard({
         activeTab={activeTab}
         crimeRegions={crimeDataForMap}
         heroesRegions={heroesDataForMap}
+        trustRegions={trustDataForMap}
         genderViolenceData={genderViolenceData}
-        trustData={trustData}
         onSelectRegion={handleSelectRegion}
         selectedRegion={selectedRegion}
       />
@@ -150,6 +172,7 @@ export default function CrimeDashboard({
         allRegions={allRegions}
         crimeDataByYear={crimeDataByYear}
         allCrimeData={allCrimeData}
+        trustData={allTrustData}
       />
       
       <Chatbot />

@@ -1,5 +1,7 @@
 import type { Region, CrimeDataPoint, GenderViolenceData, TrustData, CrimeType } from './types';
 import crimeJson from './total_crimes.json';
+import confianzaJson from './confianza.json';
+
 
 // Type assertion to handle the structure of the JSON file
 const crimesByYear: Record<string, { total_crimes_by_location: any[], crimes_by_type_and_location: any[] }> = crimeJson;
@@ -43,10 +45,17 @@ export const genderViolenceData: GenderViolenceData[] = [
   { year: 2023, cases: 155 },
 ];
 
-export const trustData: TrustData[] = [
-  { name: 'Perception of Insecurity', value: 82 },
-  { name: 'Trust in Police', value: 35 },
-];
+
+const processedTrustData: TrustData[] = confianzaJson.visualizaciones['PORCENTAJE DE CONFIANZA EN LA PNP'].map(item => ({
+    name: 'Trust in Police',
+    value: item.valor,
+    region: item.departamento,
+    year: item.periodo
+}));
+// Assuming 'Perception of Insecurity' is static for now, as it's not in confianza.json
+processedTrustData.push({ name: 'Perception of Insecurity', value: 82, region: 'NACIONAL', year: 2021 });
+
+export const trustData: TrustData[] = processedTrustData;
 
 export const crimeTypeDetails: Record<CrimeType, { icon: React.ComponentType<{ className?: string }>, description: string }> = {
     'Aggravated Robbery': {
