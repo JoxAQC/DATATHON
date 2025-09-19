@@ -7,9 +7,11 @@ export interface CrimeDataPoint {
   lat: number;
   lng: number;
   type: CrimeType;
-  date: string;
+  date: string; // Year
   district: string;
   region: string;
+  province: string;
+  count: number;
 }
 
 export interface Region {
@@ -37,4 +39,10 @@ export interface ChatMessage {
   id: string;
   role: 'user' | 'assistant';
   content: string;
+}
+
+export interface CrimeLocationDetail {
+  province: string;
+  district: string;
+  count: number;
 }

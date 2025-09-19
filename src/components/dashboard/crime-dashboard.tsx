@@ -5,17 +5,14 @@ import type { Region, CrimeDataPoint, GenderViolenceData, TrustData, CrimeType }
 import DashboardSidebar from './dashboard-sidebar';
 import MainContent from './main-content';
 import Chatbot from './chatbot';
+import { crimeDataByYear, allCrimeData, regions as allRegions } from '@/lib/data';
 
 interface CrimeDashboardProps {
-  regions: Region[];
-  initialCrimeData: CrimeDataPoint[];
   genderViolenceData: GenderViolenceData[];
   trustData: TrustData[];
 }
 
 export default function CrimeDashboard({
-  regions,
-  initialCrimeData,
   genderViolenceData,
   trustData,
 }: CrimeDashboardProps) {
@@ -24,28 +21,44 @@ export default function CrimeDashboard({
   
   const handleSelectRegion = (region: Region | null) => {
     setSelectedRegion(region);
-    if (region) {
-      setSelectedCrimeType('All');
-    }
   };
 
   const handleSelectCrimeType = (crimeType: CrimeType | 'All') => {
     setSelectedCrimeType(crimeType);
   };
   
-  const filteredCrimeData = useMemo(() => {
-    let data = initialCrimeData;
-    if (selectedRegion) {
-      data = data.filter(d => d.region === selectedRegion.name);
-    }
-    if (selectedCrimeType !== 'All') {
-      return data.filter(d => d.type === selectedCrimeType);
-    }
-    return data;
-  }, [initialCrimeData, selectedRegion, selectedCrimeType]);
+  const latestYear = useMemo(() => Object.keys(crimeDataByYear).sort().pop() || new Date().getFullYear().toString(), []);
+
+  const crimeDataForMap = useMemo(() => {
+    const dataForYear = crimeDataByYear[latestYear]?.total_crimes_by_location || [];
+    const crimeTypeData = crimeDataByYear[latestYear]?.crimes_by_type_and_location || [];
+    
+    return allRegions.map(region => {
+      let count = 0;
+      if (selectedCrimeType === 'All') {
+        const regionData = dataForYear.find(d => d.dpto_pjfs === region.name);
+        count = regionData ? regionData.cantidad : 0;
+      } else {
+        const regionCrimes = allCrimeData.filter(d => 
+            d.region === region.name && 
+            d.type === selectedCrimeType &&
+            d.date === latestYear
+        );
+        count = regionCrimes.reduce((acc, crime) => acc + crime.count, 0);
+      }
+      return {
+        ...region,
+        count,
+      };
+    });
+  }, [selectedCrimeType, latestYear]);
 
   const handleExportData = () => {
-    const dataStr = JSON.stringify(filteredCrimeData, null, 2);
+    const dataStr = JSON.stringify({
+      selectedRegion,
+      selectedCrimeType,
+      crimeDataForMap
+    }, null, 2);
     const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
     const exportFileDefaultName = 'crime_data.json';
     const linkElement = document.createElement('a');
@@ -65,14 +78,16 @@ export default function CrimeDashboard({
         onSelectCrimeType={handleSelectCrimeType}
         mostCommonCrimes={mostCommonCrimesInView}
         onExport={handleExportData}
-        allRegions={regions}
+        allRegions={allRegions}
+        crimeDataByYear={crimeDataByYear}
+        allCrimeData={allCrimeData}
       />
       <MainContent
-        regions={regions}
-        crimeData={filteredCrimeData}
+        regions={crimeDataForMap}
         genderViolenceData={genderViolenceData}
         trustData={trustData}
         onSelectRegion={handleSelectRegion}
+        selectedRegion={selectedRegion}
       />
       <Chatbot />
     </div>

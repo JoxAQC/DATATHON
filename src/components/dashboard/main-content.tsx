@@ -1,7 +1,7 @@
 "use client";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Region, CrimeDataPoint, GenderViolenceData, TrustData } from '@/lib/types';
+import type { Region, GenderViolenceData, TrustData } from '@/lib/types';
 import { Map, BarChart, Shield } from "lucide-react";
 import CrimeMapWrapper from "./crime-map-wrapper";
 import GenderViolenceChart from "./gender-violence-chart";
@@ -9,19 +9,19 @@ import TrustLevelChart from "./trust-level-chart";
 import { Card } from "../ui/card";
 
 interface MainContentProps {
-  regions: Region[];
-  crimeData: CrimeDataPoint[];
+  regions: (Region & { count: number })[];
   genderViolenceData: GenderViolenceData[];
   trustData: TrustData[];
   onSelectRegion: (region: Region | null) => void;
+  selectedRegion: Region | null;
 }
 
 export default function MainContent({
   regions,
-  crimeData,
   genderViolenceData,
   trustData,
   onSelectRegion,
+  selectedRegion,
 }: MainContentProps) {
   return (
     <main className="flex-1 p-6 bg-transparent">
@@ -45,6 +45,7 @@ export default function MainContent({
              <CrimeMapWrapper
                 regions={regions}
                 onSelectRegion={onSelectRegion}
+                selectedRegion={selectedRegion}
             />
           </Card>
         </TabsContent>

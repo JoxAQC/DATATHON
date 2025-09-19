@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import type { Region, CrimeType } from '@/lib/types';
+import type { Region, CrimeType, CrimeDataPoint, CrimeLocationDetail } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Download, Search, X } from 'lucide-react';
@@ -15,6 +15,9 @@ import { Input } from '../ui/input';
 import { getCrimeTypeFromQuery } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { CRIME_TYPES } from '@/lib/types';
+import { ScrollArea } from '../ui/scroll-area';
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { ChartContainer, ChartTooltipContent } from '../ui/chart';
 
 interface DashboardSidebarProps {
   selectedRegion: Region | null;
@@ -24,6 +27,8 @@ interface DashboardSidebarProps {
   mostCommonCrimes: CrimeType[];
   onExport: () => void;
   allRegions: Region[];
+  crimeDataByYear: Record<string, { total_crimes_by_location: any[], crimes_by_type_and_location: any[] }>;
+  allCrimeData: CrimeDataPoint[];
 }
 
 const iconMap: Record<CrimeType, React.ComponentType<any>> = {
@@ -33,6 +38,106 @@ const iconMap: Record<CrimeType, React.ComponentType<any>> = {
   'Extortion': ExtortionIcon,
 };
 
+function RegionDetails({ region, crimeDataByYear, allCrimeData }: { region: Region, crimeDataByYear: DashboardSidebarProps['crimeDataByYear'], allCrimeData: CrimeDataPoint[] }) {
+  const historicalData = useMemo(() => {
+    return Object.keys(crimeDataByYear).map(year => {
+      const yearData = crimeDataByYear[year].total_crimes_by_location;
+      const regionData = yearData.find(d => d.dpto_pjfs === region.name);
+      return {
+        year: year,
+        crimes: regionData ? regionData.cantidad : 0,
+      };
+    }).sort((a,b) => a.year.localeCompare(b.year));
+  }, [region, crimeDataByYear]);
+
+  const locationDetails: CrimeLocationDetail[] = useMemo(() => {
+    const latestYear = Object.keys(crimeDataByYear).sort().pop()!;
+    const details = allCrimeData
+      .filter(d => d.region === region.name && d.date === latestYear)
+      .reduce((acc, crime) => {
+        const key = `${crime.province}-${crime.district}`;
+        if (!acc[key]) {
+          acc[key] = { province: crime.province, district: crime.district, count: 0 };
+        }
+        acc[key].count += crime.count;
+        return acc;
+      }, {} as Record<string, CrimeLocationDetail>);
+    return Object.values(details).sort((a,b) => b.count - a.count);
+  }, [region, allCrimeData, crimeDataByYear]);
+
+  const regionWithStats: Region = {
+    ...region,
+    crimeStats: `Historical data available from ${historicalData[0]?.year} to ${historicalData[historicalData.length-1]?.year}.`,
+    crimeTrends: `In ${historicalData[historicalData.length-1]?.year}, there were ${historicalData[historicalData.length-1]?.crimes.toLocaleString()} crimes.`
+  }
+
+  return (
+    <div className="flex-1 flex flex-col min-h-0">
+      <div className="flex justify-between items-center">
+        <h2 className="font-headline text-2xl text-primary">{region.name}</h2>
+        <Button variant="ghost" size="icon" onClick={() => onSelectRegion(null)} className="h-8 w-8">
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+      <ScrollArea className="flex-1 pr-3 mt-2">
+        <div className="space-y-4">
+          <div>
+            <h3 className="font-headline text-lg text-primary/90">Historical Crime Trend</h3>
+            <Card className="h-48 w-full p-2 comic-panel">
+              <ChartContainer config={{crimes: {label: 'Crimes', color: 'hsl(var(--primary))'}}}>
+                <ResponsiveContainer>
+                  <LineChart data={historicalData} margin={{ top: 20, right: 20, left: -10, bottom: 0 }}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis dataKey="year" tickLine={false} axisLine={false} tickMargin={8} fontSize={12}/>
+                    <YAxis tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+                    <Tooltip content={<ChartTooltipContent />} />
+                    <Line type="monotone" dataKey="crimes" stroke="var(--color-crimes)" strokeWidth={2} dot={true} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </ChartContainer>
+            </Card>
+          </div>
+
+          <div>
+            <h3 className="font-headline text-lg text-primary/90">AI Summary</h3>
+            <RegionSummary region={regionWithStats} />
+          </div>
+
+          <div>
+             <h3 className="font-headline text-lg text-primary/90">Crime by Location (Latest Year)</h3>
+             <Card className="max-h-60 overflow-y-auto comic-panel">
+                <CardContent className="p-2">
+                    {locationDetails.length > 0 ? (
+                        <table className="w-full text-sm">
+                            <thead>
+                                <tr className="text-left font-semibold">
+                                    <th className="p-2">Province</th>
+                                    <th className="p-2">District</th>
+                                    <th className="p-2 text-right">Crimes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {locationDetails.map((loc, i) => (
+                                    <tr key={i} className="border-t border-border">
+                                        <td className="p-2">{loc.province}</td>
+                                        <td className="p-2">{loc.district}</td>
+                                        <td className="p-2 text-right font-bold">{loc.count.toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    ) : (
+                        <p className="text-muted-foreground p-4 text-center">No detailed data available for this region.</p>
+                    )}
+                </CardContent>
+             </Card>
+          </div>
+        </div>
+      </ScrollArea>
+    </div>
+  )
+}
+
 export default function DashboardSidebar({
   selectedRegion,
   onSelectRegion,
@@ -41,6 +146,8 @@ export default function DashboardSidebar({
   mostCommonCrimes,
   onExport,
   allRegions,
+  crimeDataByYear,
+  allCrimeData
 }: DashboardSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -88,30 +195,26 @@ export default function DashboardSidebar({
         </form>
       </div>
 
-      {selectedRegion ? (
-        <div className="mt-6 flex-1 flex flex-col min-h-0">
-          <div className="flex justify-between items-center">
-             <h2 className="font-headline text-2xl text-primary">{selectedRegion.name}</h2>
-             <Button variant="ghost" size="icon" onClick={() => onSelectRegion(null)} className="h-8 w-8">
-                 <X className="h-4 w-4" />
-             </Button>
-          </div>
-          <RegionSummary region={selectedRegion} />
-        </div>
-      ) : (
-        <div className="mt-6 flex-1 flex flex-col min-h-0">
-           <h2 className="font-headline text-2xl text-primary">Global View</h2>
-           <p className="text-muted-foreground text-sm mb-4">Click a region on the map for details or filter by crime type below.</p>
-           <div className="space-y-2">
+      <div className="mt-6 flex-1 flex flex-col min-h-0">
+        {selectedRegion ? (
+          <RegionDetails region={selectedRegion} crimeDataByYear={crimeDataByYear} allCrimeData={allCrimeData} />
+        ) : (
+          <>
+            <h2 className="font-headline text-2xl text-primary">Global View</h2>
+            <p className="text-muted-foreground text-sm mb-4">Click a region on the map for details or filter by crime type below.</p>
             <h3 className="font-headline text-xl text-primary/80">All Regions</h3>
-            {allRegions.map(region => (
-              <Button key={region.id} variant="ghost" className="w-full justify-start" onClick={() => onSelectRegion(region)}>
-                {region.name}
-              </Button>
-            ))}
-           </div>
-        </div>
-      )}
+            <ScrollArea className="flex-1 pr-3">
+              <div className="space-y-1">
+                {allRegions.map(region => (
+                  <Button key={region.id} variant="ghost" className="w-full justify-start text-left h-auto py-2" onClick={() => onSelectRegion(region)}>
+                    {region.name}
+                  </Button>
+                ))}
+              </div>
+            </ScrollArea>
+          </>
+        )}
+      </div>
 
 
       <div className="mt-auto pt-4 border-t">

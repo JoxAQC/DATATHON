@@ -1,0 +1,53 @@
+{
+    "2019": {
+        "total_crimes_by_location": [
+            {
+                "year": 2019,
+                "mes": "ENERO - DICIEMBRE",
+                "dpto_pjfs": "AMAZONAS",
+                "prov_pjfs": "CHACHAPOYAS",
+                "dist_pjfs": "CHACHAPOYAS",
+                "ubigeo_pjfs": 10101,
+                "cantidad": 10822
+            }
+        ],
+        "crimes_by_type_and_location": [
+            {
+                "year": 2019,
+                "mes": "ENERO - DICIEMBRE",
+                "dpto_pjfs": "AMAZONAS",
+                "prov_pjfs": "CHACHAPOYAS",
+                "dist_pjfs": "CHACHAPOYAS",
+                "ubigeo_pjfs": 10101,
+                "des_articulo": "ABANDONO DE MUJER GESTANTE Y EN SITUACION CRITICA",
+                "cantidad": 4
+            }
+
+        ]
+    },
+    "2020": {
+        "total_crimes_by_location": [
+            {
+                "year": 2020,
+                "mes": "ENERO - DICIEMBRE",
+                "dpto_pjfs": "AMAZONAS",
+                "prov_pjfs": "CHACHAPOYAS",
+                "dist_pjfs": "CHACHAPOYAS",
+                "ubigeo_pjfs": 10101,
+                "cantidad": 8572
+            }
+        ],
+        "crimes_by_type_and_location": [
+            {
+                "year": 2020,
+                "mes": "ENERO - DICIEMBRE",
+                "dpto_pjfs": "AMAZONAS",
+                "prov_pjfs": "CHACHAPOYAS",
+                "dist_pjfs": "CHACHAPOYAS",
+                "ubigeo_pjfs": 10101,
+                "des_articulo": "ABANDONO DE CARGO (ABUSO DE AUTORIDAD)",
+                "cantidad": 2
+            }
+        ]
+    }
+}
