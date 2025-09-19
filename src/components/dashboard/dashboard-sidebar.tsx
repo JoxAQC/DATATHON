@@ -84,11 +84,20 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, 
 
   const regionalTrustData = useMemo(() => {
     const normalizedRegionName = removeAccents(region.name).toUpperCase();
+    
+    const latestYearData = trustData.filter(d => d.name === 'Trust in Police').sort((a, b) => b.year - a.year);
+    const latestYear = latestYearData.length > 0 ? latestYearData[0].year : new Date().getFullYear();
+
+    const trustInPoliceData = trustData.find(d => 
+        removeAccents(d.region || "").toUpperCase() === normalizedRegionName && 
+        d.name === 'Trust in Police' &&
+        d.year === latestYear
+    );
+
     const perceptionData = trustData.find(d => d.name === 'Perception of Insecurity');
-    const trustInPoliceData = trustData.find(d => removeAccents(d.region || "").toUpperCase() === normalizedRegionName && d.name === 'Trust in Police');
 
     const data: TrustData[] = [];
-    if(perceptionData) data.push(perceptionData);
+    if(perceptionData) data.push(perceptionData); // National perception
     if(trustInPoliceData) data.push(trustInPoliceData);
     
     return data;
@@ -204,7 +213,9 @@ export default function DashboardSidebar({
   
   const nationalTrustData = useMemo(() => {
     const perceptionData = trustData.find(d => d.name === 'Perception of Insecurity');
-    const trustInPoliceData = trustData.find(d => d.region === 'NACIONAL' && d.name === 'Trust in Police');
+    const latestYearData = trustData.filter(d => d.name === 'Trust in Police').sort((a, b) => b.year - a.year);
+    const latestYear = latestYearData.length > 0 ? latestYearData[0].year : new Date().getFullYear();
+    const trustInPoliceData = trustData.find(d => d.region === 'NACIONAL' && d.name === 'Trust in Police' && d.year === latestYear);
     
     const data: TrustData[] = [];
     if(perceptionData) data.push(perceptionData);
@@ -281,3 +292,5 @@ export default function DashboardSidebar({
     </aside>
   );
 }
+
+    
