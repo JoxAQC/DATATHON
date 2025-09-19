@@ -53,8 +53,8 @@ export default function CrimeDashboard({
       const normalizedRegionName = removeAccents(region.name).toUpperCase();
       
       if (selectedCrimeType === 'All') {
-        const regionData = dataForYear.find(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
-        count = regionData ? regionData.cantidad : 0;
+        const regionData = dataForYear.filter(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
+        count = regionData.reduce((acc, current) => acc + current.cantidad, 0);
       } else {
         const regionCrimes = allCrimeData.filter(d => 
             removeAccents(d.region).toUpperCase() === normalizedRegionName && 
@@ -68,7 +68,7 @@ export default function CrimeDashboard({
         count,
       };
     });
-  }, [selectedCrimeType, latestYear, allCrimeData]);
+  }, [selectedCrimeType, latestYear]);
 
   const heroesDataForMap = useMemo(() => {
     const heroesByRegion = heroesData.police_by_location.reduce((acc, hero) => {
