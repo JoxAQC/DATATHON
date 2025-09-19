@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mapa Interactivo del Perú</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body>
+  <div id="map" style="height: 100vh;"></div>
+  <script>
+    // Crear mapa centrado en Perú
+    var map = L.map('map').setView([-9.19, -75.015], 5);
+
+    // Capa base (OpenStreetMap)
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18,
+      attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
+
+    // Estilo por defecto
+    function style(feature) {
+      return {
+        fillColor: "#3f83f8",
+        weight: 1,
+        opacity: 1,
+        color: "white",
+        dashArray: "3",
+        fillOpacity: 0.6
+      };
+    }
+
+    // Evento hover (resaltar región)
+    function highlightFeature(e) {
+      var layer = e.target;
+      layer.setStyle({
+        weight: 3,
+        color: "#666",
+        fillOpacity: 0.8
+      });
+      layer.bringToFront();
+    }
+
+    // Quitar highlight
+    function resetHighlight(e) {
+      geojson.resetStyle(e.target);
+    }
+
+    // Evento click (mostrar ID temporal)
+    function onRegionClick(e) {
+      var props = e.target.feature.properties;
+      alert("Has hecho click en la región #" + props.NOMBDEP);
+    }
+
+    // Asociar eventos a cada feature
+    function onEachFeature(feature, layer) {
+      layer.on({
+        mouseover: highlightFeature,
+        mouseout: resetHighlight,
+        click: onRegionClick
+      });
+    }
+
+    // Cargar GeoJSON
+    fetch("peru_departamental_simple.json")
+      .then(res => res.json())
+      .then(data => {
+        // Agregar un ID numérico a cada feature si no lo tiene
+        data.features.forEach((f, i) => {
+          if (!f.properties) f.properties = {};
+          f.properties.id = i + 1;
+        });
+
+        geojson = L.geoJSON(data, {
+          style: style,
+          onEachFeature: onEachFeature
+        }).addTo(map);
+      });
+  </script>
+</body>
+</html>

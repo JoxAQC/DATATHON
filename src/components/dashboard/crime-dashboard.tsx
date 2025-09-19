@@ -112,20 +112,17 @@ export default function CrimeDashboard({
       <aside className="w-24 flex-shrink-0 bg-card p-4 flex flex-col items-center justify-center z-20 comic-panel">
          <TabsList className="bg-transparent flex-col gap-4 h-full">
             <TabsTrigger value="map" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <Map className="mb-1 h-7 w-7" />
-                <span>Mapa</span>
+                 <img src="/icono_mapa_crimenes.png" alt="Icono de Mapa de Crímenes" className="mr-2 h-20 w-20" />
+                {/* <span>Mapa</span> */}
             </TabsTrigger>
             <TabsTrigger value="heroes" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <ShieldCheck className="mb-1 h-7 w-7" />
-                <span>Héroes</span>
+                <img src="/icono_policia.png" alt="Icono de Mapa de Crímenes" className="mr-2 h-20 w-20" />
             </TabsTrigger>
             <TabsTrigger value="gender-violence" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <BarChart className="mb-1 h-7 w-7" />
-                <span>Género</span>
+                <img src="/icono_violencia_genero.png" alt="Icono de Mapa de Crímenes" className="mr-2 h-20 w-20" />
             </TabsTrigger>
             <TabsTrigger value="trust" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <Shield className="mb-1 h-7 w-7" />
-                <span>Confianza</span>
+                <img src="/icono_confianza.png" alt="Icono de Mapa de Crímenes" className="mr-2 h-20 w-20" />
             </TabsTrigger>
         </TabsList>
       </aside>

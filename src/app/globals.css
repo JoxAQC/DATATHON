@@ -32,6 +32,14 @@
   }
 }
 
+body {
+  margin: 90px 64px;
+  background-image: url('../../public/IMG_9169.png'); /* Ruta de tu imagen */
+  background-size: cover; /* ¡Esto es lo más importante! */
+  background-position: center; /* Opcional: centra la imagen */
+  background-repeat: no-repeat; /* Opcional: evita que la imagen se repita si no es lo suficientemente grande */
+}
+
 @layer base {
   * {
     @apply border-border;
