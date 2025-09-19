@@ -180,6 +180,10 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
             </>
           )}
 
+          {activeTab === 'heroes' && (
+              <p className="text-muted-foreground p-4 text-center">No additional details for Heroes view.</p>
+          )}
+
           {activeTab === 'gender-violence' && (
             <GenderViolenceChart 
                 region={region} 
@@ -187,10 +191,13 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
             />
           )}
 
-          <div>
-            <h3 className="font-headline text-lg text-primary/90">Public Trust</h3>
-            <TrustLevelChart data={regionalTrustData} />
-          </div>
+          {activeTab === 'trust' && (
+            <div>
+              <h3 className="font-headline text-lg text-primary/90">Public Trust</h3>
+              <TrustLevelChart data={regionalTrustData} />
+            </div>
+          )}
+
         </div>
       </ScrollArea>
     </div>
@@ -255,18 +262,21 @@ export default function DashboardSidebar({
         <p className="text-muted-foreground -mt-2">Crime Comic Dashboard</p>
       </header>
 
-      <div className="mt-6">
-        <form onSubmit={handleSearch} className="relative">
-          <Input
-            placeholder="Filter by crime type e.g. 'theft'..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          <Button size="icon" variant="ghost" type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" disabled={isSearching}>
-            <Search className={cn("h-4 w-4", isSearching && "animate-spin")} />
-          </Button>
-        </form>
-      </div>
+      {activeTab === 'map' && (
+        <div className="mt-6">
+          <form onSubmit={handleSearch} className="relative">
+            <Input
+              placeholder="Filter by crime type e.g. 'theft'..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button size="icon" variant="ghost" type="submit" className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8" disabled={isSearching}>
+              <Search className={cn("h-4 w-4", isSearching && "animate-spin")} />
+            </Button>
+          </form>
+        </div>
+      )}
+
 
       <div className="mt-6 flex-1 flex flex-col min-h-0">
         {selectedRegion ? (
@@ -294,26 +304,30 @@ export default function DashboardSidebar({
 
 
       <div className="mt-auto pt-4 border-t">
-        <h3 className="font-headline text-xl text-primary/80 mb-2">
-          {selectedRegion ? 'Common Crimes' : 'Filter by Crime'}
-        </h3>
-        <div className="grid grid-cols-2 gap-2 mb-4">
-          {(activeTab === 'map' ? mostCommonCrimes : []).map((crime) => {
-            const Icon = iconMap[crime];
-            const isActive = selectedCrimeType === crime;
-            return (
-              <Button
-                key={crime}
-                variant={isActive ? 'default' : 'outline'}
-                className="h-auto flex flex-col items-center p-2 gap-1 text-center comic-panel"
-                onClick={() => onSelectCrimeType(isActive ? 'All' : crime)}
-              >
-                {Icon && <Icon className="w-8 h-8" />}
-                <span className="text-xs font-semibold">{crime}</span>
-              </Button>
-            );
-          })}
-        </div>
+        {activeTab === 'map' && (
+          <>
+            <h3 className="font-headline text-xl text-primary/80 mb-2">
+              {selectedRegion ? 'Common Crimes' : 'Filter by Crime'}
+            </h3>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              {mostCommonCrimes.map((crime) => {
+                const Icon = iconMap[crime];
+                const isActive = selectedCrimeType === crime;
+                return (
+                  <Button
+                    key={crime}
+                    variant={isActive ? 'default' : 'outline'}
+                    className="h-auto flex flex-col items-center p-2 gap-1 text-center comic-panel"
+                    onClick={() => onSelectCrimeType(isActive ? 'All' : crime)}
+                  >
+                    {Icon && <Icon className="w-8 h-8" />}
+                    <span className="text-xs font-semibold">{crime}</span>
+                  </Button>
+                );
+              })}
+            </div>
+          </>
+        )}
         <Button onClick={onExport} className="w-full comic-panel">
           <Download className="mr-2 h-4 w-4" />
           Export Current Data

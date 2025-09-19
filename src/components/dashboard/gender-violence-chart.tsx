@@ -19,7 +19,7 @@ const removeAccents = (str: string) => {
 const chartConfig = {
   cases: {
     label: "Femicide Cases",
-    color: "hsl(var(--chart-3))",
+    color: "hsl(var(--destructive))",
   },
 } satisfies ChartConfig;
 
@@ -75,7 +75,7 @@ export default function GenderViolenceChart({ region, allData }: GenderViolenceC
         .slice(0, 3)
         .map(([district]) => district);
 
-    if (topDistricts.length === 0) return { data: [], config: {} };
+    if (topDistricts.length === 0) return { data: [], config: {}, districts: topDistricts };
 
     const historicalDataByYear: Record<string, any> = {};
 
