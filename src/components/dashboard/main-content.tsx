@@ -1,9 +1,8 @@
 "use client";
 
 import { TabsContent } from "@/components/ui/tabs";
-import type { Region, GenderViolenceData, TrustData } from '@/lib/types';
+import type { Region, GenderViolenceCase } from '@/lib/types';
 import CrimeMapWrapper from "./crime-map-wrapper";
-import GenderViolenceChart from "./gender-violence-chart";
 import { Card } from "../ui/card";
 
 interface MainContentProps {
@@ -11,7 +10,7 @@ interface MainContentProps {
   crimeRegions: (Region & { count: number })[];
   heroesRegions: (Region & { count: number })[];
   trustRegions: (Region & { count: number })[];
-  genderViolenceData: GenderViolenceData[];
+  genderViolenceRegions: (Region & { count: number })[];
   onSelectRegion: (region: Region | null) => void;
   selectedRegion: Region | null;
 }
@@ -21,7 +20,7 @@ export default function MainContent({
   crimeRegions,
   heroesRegions,
   trustRegions,
-  genderViolenceData,
+  genderViolenceRegions,
   onSelectRegion,
   selectedRegion,
 }: MainContentProps) {
@@ -48,7 +47,14 @@ export default function MainContent({
           </Card>
         </TabsContent>
         <TabsContent value="gender-violence" className="h-full mt-0">
-          <GenderViolenceChart data={genderViolenceData} />
+           <Card className="h-full w-full overflow-auto p-4 comic-panel">
+            <CrimeMapWrapper
+              regions={genderViolenceRegions}
+              onSelectRegion={onSelectRegion}
+              selectedRegion={selectedRegion}
+              viewType="gender"
+            />
+          </Card>
         </TabsContent>
         <TabsContent value="trust" className="h-full mt-0">
           <Card className="h-full w-full overflow-auto p-4 comic-panel">

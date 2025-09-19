@@ -1,6 +1,7 @@
-import type { Region, CrimeDataPoint, GenderViolenceData, TrustData, CrimeType } from './types';
+import type { Region, CrimeDataPoint, GenderViolenceCase, TrustData, CrimeType } from './types';
 import crimeJson from './total_crimes.json';
 import confianzaJson from './confianza.json';
+import genderViolenceJson from './gender-violence.json';
 
 
 // Type assertion to handle the structure of the JSON file
@@ -37,13 +38,7 @@ export const regions: Region[] = [
 
 export const crimeData: CrimeDataPoint[] = [];
 
-export const genderViolenceData: GenderViolenceData[] = [
-  { year: 2019, cases: 166 },
-  { year: 2020, cases: 138 },
-  { year: 2021, cases: 146 },
-  { year: 2022, cases: 130 },
-  { year: 2023, cases: 155 },
-];
+export const genderViolenceData: GenderViolenceCase[] = genderViolenceJson.cases_by_location;
 
 
 const processedTrustData: TrustData[] = confianzaJson.visualizaciones['PORCENTAJE DE CONFIANZA EN LA PNP'].map(item => ({

@@ -25,9 +25,14 @@ export interface Region {
   mostCommonCrimes: CrimeType[];
 }
 
-export interface GenderViolenceData {
-  year: number;
-  cases: number;
+export interface GenderViolenceCase {
+  año: number;
+  mes: number;
+  dpto_hecho: string;
+  prov_hecho: string;
+  dist_hecho: string;
+  cantidad: number;
+  disminucion: boolean;
 }
 
 export interface TrustData {

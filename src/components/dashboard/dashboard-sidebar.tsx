@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import type { Region, CrimeType, CrimeDataPoint, CrimeLocationDetail, TrustData } from '@/lib/types';
+import type { Region, CrimeType, CrimeDataPoint, CrimeLocationDetail, TrustData, GenderViolenceCase } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Download, Search, X } from 'lucide-react';
@@ -19,8 +19,10 @@ import { ScrollArea } from '../ui/scroll-area';
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '../ui/chart';
 import TrustLevelChart from './trust-level-chart';
+import GenderViolenceChart from './gender-violence-chart';
 
 interface DashboardSidebarProps {
+  activeTab: string;
   selectedRegion: Region | null;
   onSelectRegion: (region: Region | null) => void;
   selectedCrimeType: CrimeType | 'All';
@@ -31,6 +33,7 @@ interface DashboardSidebarProps {
   crimeDataByYear: Record<string, { total_crimes_by_location: any[], crimes_by_type_and_location: any[] }>;
   allCrimeData: CrimeDataPoint[];
   trustData: TrustData[];
+  genderViolenceData: GenderViolenceCase[];
 }
 
 const iconMap: Record<CrimeType, React.ComponentType<any>> = {
@@ -46,13 +49,20 @@ const removeAccents = (str: string) => {
   return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 };
 
-function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, trustData }: { region: Region, crimeDataByYear: DashboardSidebarProps['crimeDataByYear'], allCrimeData: CrimeDataPoint[], onSelectRegion: (region: Region | null) => void, trustData: TrustData[] }) {
+function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData, onSelectRegion, activeTab }: { 
+  region: Region, 
+  crimeDataByYear: DashboardSidebarProps['crimeDataByYear'], 
+  trustData: TrustData[],
+  genderViolenceData: GenderViolenceCase[],
+  onSelectRegion: (region: Region | null) => void,
+  activeTab: string
+}) {
   const historicalData = useMemo(() => {
     const normalizedRegionName = removeAccents(region.name).toUpperCase();
     return Object.keys(crimeDataByYear).map(year => {
       const yearData = crimeDataByYear[year].total_crimes_by_location;
-      const regionData = yearData.filter(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
-      const totalCrimes = regionData.reduce((acc, current) => acc + current.cantidad, 0);
+      const regionDataForYear = yearData.filter(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
+      const totalCrimes = regionDataForYear.reduce((acc, current) => acc + current.cantidad, 0);
       return {
         year: year,
         crimes: totalCrimes,
@@ -63,6 +73,8 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, 
   const locationDetails: CrimeLocationDetail[] = useMemo(() => {
     const normalizedRegionName = removeAccents(region.name).toUpperCase();
     const latestYear = Object.keys(crimeDataByYear).sort((a, b) => b.localeCompare(a))[0]!;
+    
+    if (!crimeDataByYear[latestYear]) return [];
     
     const latestYearCrimes = crimeDataByYear[latestYear].crimes_by_type_and_location;
 
@@ -112,57 +124,68 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, 
       <ScrollArea className="flex-1 pr-3 mt-2">
         <div className="space-y-4">
           
-          <div>
-            <h3 className="font-headline text-lg text-primary/90">Historical Crime Trend</h3>
-            <Card className="h-48 w-full p-2 comic-panel">
-              <ChartContainer config={{crimes: {label: 'Crimes', color: 'hsl(var(--primary))'}}}>
-                <ResponsiveContainer>
-                  <LineChart data={historicalData} margin={{ top: 20, right: 20, left: -10, bottom: 0 }}>
-                    <CartesianGrid vertical={false} />
-                    <XAxis dataKey="year" tickLine={false} axisLine={false} tickMargin={8} fontSize={12}/>
-                    <YAxis tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
-                    <Tooltip content={<ChartTooltipContent />} />
-                    <Line type="monotone" dataKey="crimes" stroke="var(--color-crimes)" strokeWidth={2} dot={true} />
-                  </LineChart>
-                </ResponsiveContainer>
-              </ChartContainer>
-            </Card>
-          </div>
+          {activeTab === 'map' && (
+            <>
+              <div>
+                <h3 className="font-headline text-lg text-primary/90">Historical Crime Trend</h3>
+                <Card className="h-48 w-full p-2 comic-panel">
+                  <ChartContainer config={{crimes: {label: 'Crimes', color: 'hsl(var(--primary))'}}}>
+                    <ResponsiveContainer>
+                      <LineChart data={historicalData} margin={{ top: 20, right: 20, left: -10, bottom: 0 }}>
+                        <CartesianGrid vertical={false} />
+                        <XAxis dataKey="year" tickLine={false} axisLine={false} tickMargin={8} fontSize={12}/>
+                        <YAxis tickLine={false} axisLine={false} tickMargin={8} fontSize={12} />
+                        <Tooltip content={<ChartTooltipContent />} />
+                        <Line type="monotone" dataKey="crimes" stroke="var(--color-crimes)" strokeWidth={2} dot={true} />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </Card>
+              </div>
 
-          <div>
-            <h3 className="font-headline text-lg text-primary/90">AI Summary</h3>
-            <RegionSummary region={regionWithStats} />
-          </div>
+              <div>
+                <h3 className="font-headline text-lg text-primary/90">AI Summary</h3>
+                <RegionSummary region={regionWithStats} />
+              </div>
 
-          <div>
-             <h3 className="font-headline text-lg text-primary/90">Crime by Location (Latest Year)</h3>
-             <Card className="max-h-60 overflow-y-auto comic-panel">
-                <CardContent className="p-2">
-                    {locationDetails.length > 0 ? (
-                        <table className="w-full text-sm">
-                            <thead>
-                                <tr className="text-left font-semibold">
-                                    <th className="p-2">Province</th>
-                                    <th className="p-2">District</th>
-                                    <th className="p-2 text-right">Crimes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {locationDetails.map((loc, i) => (
-                                    <tr key={i} className="border-t border-border">
-                                        <td className="p-2">{loc.province}</td>
-                                        <td className="p-2">{loc.district}</td>
-                                        <td className="p-2 text-right font-bold">{loc.count.toLocaleString()}</td>
+              <div>
+                 <h3 className="font-headline text-lg text-primary/90">Crime by Location (Latest Year)</h3>
+                 <Card className="max-h-60 overflow-y-auto comic-panel">
+                    <CardContent className="p-2">
+                        {locationDetails.length > 0 ? (
+                            <table className="w-full text-sm">
+                                <thead>
+                                    <tr className="text-left font-semibold">
+                                        <th className="p-2">Province</th>
+                                        <th className="p-2">District</th>
+                                        <th className="p-2 text-right">Crimes</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    ) : (
-                        <p className="text-muted-foreground p-4 text-center">No detailed data available for this region.</p>
-                    )}
-                </CardContent>
-             </Card>
-          </div>
+                                </thead>
+                                <tbody>
+                                    {locationDetails.map((loc, i) => (
+                                        <tr key={i} className="border-t border-border">
+                                            <td className="p-2">{loc.province}</td>
+                                            <td className="p-2">{loc.district}</td>
+                                            <td className="p-2 text-right font-bold">{loc.count.toLocaleString()}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        ) : (
+                            <p className="text-muted-foreground p-4 text-center">No detailed data available for this region.</p>
+                        )}
+                    </CardContent>
+                 </Card>
+              </div>
+            </>
+          )}
+
+          {activeTab === 'gender-violence' && (
+            <GenderViolenceChart 
+                region={region} 
+                allData={genderViolenceData}
+            />
+          )}
 
           <div>
             <h3 className="font-headline text-lg text-primary/90">Public Trust</h3>
@@ -175,6 +198,7 @@ function RegionDetails({ region, crimeDataByYear, allCrimeData, onSelectRegion, 
 }
 
 export default function DashboardSidebar({
+  activeTab,
   selectedRegion,
   onSelectRegion,
   selectedCrimeType,
@@ -184,7 +208,8 @@ export default function DashboardSidebar({
   allRegions,
   crimeDataByYear,
   allCrimeData,
-  trustData
+  trustData,
+  genderViolenceData,
 }: DashboardSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -245,7 +270,14 @@ export default function DashboardSidebar({
 
       <div className="mt-6 flex-1 flex flex-col min-h-0">
         {selectedRegion ? (
-          <RegionDetails region={selectedRegion} crimeDataByYear={crimeDataByYear} allCrimeData={allCrimeData} onSelectRegion={onSelectRegion} trustData={trustData} />
+          <RegionDetails 
+            region={selectedRegion} 
+            crimeDataByYear={crimeDataByYear} 
+            onSelectRegion={onSelectRegion} 
+            trustData={trustData}
+            genderViolenceData={genderViolenceData}
+            activeTab={activeTab}
+          />
         ) : (
           <div className="flex-1 flex flex-col justify-center text-center space-y-4">
             <div>
@@ -266,7 +298,7 @@ export default function DashboardSidebar({
           {selectedRegion ? 'Common Crimes' : 'Filter by Crime'}
         </h3>
         <div className="grid grid-cols-2 gap-2 mb-4">
-          {mostCommonCrimes.map((crime) => {
+          {(activeTab === 'map' ? mostCommonCrimes : []).map((crime) => {
             const Icon = iconMap[crime];
             const isActive = selectedCrimeType === crime;
             return (
