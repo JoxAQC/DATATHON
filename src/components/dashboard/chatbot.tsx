@@ -67,17 +67,26 @@ export default function Chatbot() {
   return (
     <>
       <Button
-        className="fixed bottom-6 right-6 h-16 w-16 rounded-full shadow-2xl z-50"
+        className="fixed bottom-6 right-6 h-24 w-24 rounded-full shadow-2xl z-50 p-0"
         onClick={() => setIsOpen(true)}
         aria-label="Open Chatbot"
       >
-        <MessageCircleQuestion className="h-8 w-8" />
+        <Avatar className="h-full w-full">
+          <img src="/bot.png" alt="Bot Avatar" className="rounded-full object-cover" />
+          <AvatarFallback>
+            <Bot className="h-12 w-12" />
+          </AvatarFallback>
+        </Avatar>
       </Button>
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogContent className="sm:max-w-[425px] h-[70vh] flex flex-col p-0">
           <DialogHeader className="p-4 border-b">
             <DialogTitle className="flex items-center gap-2 font-headline text-2xl text-primary">
-              <Bot />
+              <Avatar className="h-24 w-24">
+                <AvatarFallback>
+                  <Bot />
+                </AvatarFallback>
+              </Avatar>
               Crime Guide Assistant
             </DialogTitle>
           </DialogHeader>
@@ -92,9 +101,10 @@ export default function Chatbot() {
                   )}
                 >
                   {message.role === "assistant" && (
-                    <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
+                    <Avatar className="h-24 w-24 bg-primary text-primary-foreground">
+                      <img src="/bot.png" alt="Bot Avatar" className="rounded-full" />
                       <AvatarFallback>
-                        <Bot className="h-5 w-5" />
+                        <Bot className="h-12 w-12" />
                       </AvatarFallback>
                     </Avatar>
                   )}
@@ -111,15 +121,15 @@ export default function Chatbot() {
                 </div>
               ))}
               {isLoading && (
-                 <div className="flex items-start gap-3 justify-start">
-                    <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
-                      <AvatarFallback>
-                        <Bot className="h-5 w-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="bg-muted rounded-lg p-3">
-                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                    </div>
+                <div className="flex items-start gap-3 justify-start">
+                  <Avatar className="h-24 w-24 bg-primary text-primary-foreground">
+                    <AvatarFallback>
+                      <Bot className="h-12 w-12" />
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="bg-muted rounded-lg p-3">
+                    <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                  </div>
                 </div>
               )}
             </div>

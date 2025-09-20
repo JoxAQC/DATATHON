@@ -32,20 +32,7 @@
   }
 }
 
-body {
-  display: inline-block; /* El body se encoge al tamaño de su contenido */
-  height: 100vh; /* Asegura que el body ocupe toda la altura de la ventana */
 
-  background-image: url('../../public/IMG_9169.png');
-  background-size: cover;    /* Hace que la imagen cubra el área del body */
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  transform: scale(0.9)
-}
 
 .comic-panel {
   border-radius: 20px;
