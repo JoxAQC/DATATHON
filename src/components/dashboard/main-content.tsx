@@ -1,9 +1,9 @@
 "use client";
 
 import { TabsContent } from "@/components/ui/tabs";
-import type { Region, GenderViolenceCase } from '@/lib/types';
-import CrimeMapWrapper from "./crime-map-wrapper";
+import type { Region } from '@/lib/types';
 import { Card } from "../ui/card";
+import PeruExplorerClient from "../ui/peru-explorer-client";
 
 interface MainContentProps {
   activeTab: string;
@@ -27,8 +27,8 @@ export default function MainContent({
   return (
     <main className="flex-1 p-6 bg-transparent">
         <TabsContent value="map" className="h-full mt-0">
-          <Card className="h-full w-full overflow-auto p-4 comic-panel">
-             <CrimeMapWrapper
+          <Card className="h-full w-full overflow-hidden p-4 comic-panel">
+             <PeruExplorerClient
                 regions={crimeRegions}
                 onSelectRegion={onSelectRegion}
                 selectedRegion={selectedRegion}
@@ -37,8 +37,8 @@ export default function MainContent({
           </Card>
         </TabsContent>
          <TabsContent value="heroes" className="h-full mt-0">
-          <Card className="h-full w-full overflow-auto p-4 comic-panel">
-             <CrimeMapWrapper
+          <Card className="h-full w-full overflow-hidden p-4 comic-panel">
+             <PeruExplorerClient
                 regions={heroesRegions}
                 onSelectRegion={onSelectRegion}
                 selectedRegion={selectedRegion}
@@ -47,8 +47,8 @@ export default function MainContent({
           </Card>
         </TabsContent>
         <TabsContent value="gender-violence" className="h-full mt-0">
-           <Card className="h-full w-full overflow-auto p-4 comic-panel">
-            <CrimeMapWrapper
+           <Card className="h-full w-full overflow-hidden p-4 comic-panel">
+            <PeruExplorerClient
               regions={genderViolenceRegions}
               onSelectRegion={onSelectRegion}
               selectedRegion={selectedRegion}
@@ -57,8 +57,8 @@ export default function MainContent({
           </Card>
         </TabsContent>
         <TabsContent value="trust" className="h-full mt-0">
-          <Card className="h-full w-full overflow-auto p-4 comic-panel">
-            <CrimeMapWrapper
+          <Card className="h-full w-full overflow-hidden p-4 comic-panel">
+            <PeruExplorerClient
               regions={trustRegions}
               onSelectRegion={onSelectRegion}
               selectedRegion={selectedRegion}
