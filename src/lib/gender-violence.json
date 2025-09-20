@@ -1,0 +1,193 @@
+{
+    "cases_by_location": [
+        {
+            "año": 2018,
+            "mes": 1,
+            "dpto_hecho": "AMAZONAS",
+            "prov_hecho": "BAGUA",
+            "dist_hecho": "ARAMANGO",
+            "cantidad": 3,
+            "disminucion": true
+        },
+        {
+            "año": 2018,
+            "mes": 1,
+            "dpto_hecho": "AMAZONAS",
+            "prov_hecho": "BAGUA",
+            "dist_hecho": "BAGUA",
+            "cantidad": 22,
+            "disminucion": true
+        },
+        {
+            "año": 2019,
+            "mes": 1,
+            "dpto_hecho": "AMAZONAS",
+            "prov_hecho": "BAGUA",
+            "dist_hecho": "ARAMANGO",
+            "cantidad": 5,
+            "disminucion": false
+        },
+        {
+            "año": 2019,
+            "mes": 1,
+            "dpto_hecho": "AMAZONAS",
+            "prov_hecho": "BAGUA",
+            "dist_hecho": "BAGUA",
+            "cantidad": 25,
+            "disminucion": false
+        },
+        {
+            "año": 2020,
+            "mes": 1,
+            "dpto_hecho": "AMAZONAS",
+            "prov_hecho": "BAGUA",
+            "dist_hecho": "BAGUA",
+            "cantidad": 18,
+            "disminucion": true
+        },
+        {
+            "año": 2018,
+            "mes": 2,
+            "dpto_hecho": "AREQUIPA",
+            "prov_hecho": "AREQUIPA",
+            "dist_hecho": "CERRO COLORADO",
+            "cantidad": 40,
+            "disminucion": false
+        },
+        {
+            "año": 2019,
+            "mes": 2,
+            "dpto_hecho": "AREQUIPA",
+            "prov_hecho": "AREQUIPA",
+            "dist_hecho": "CERRO COLORADO",
+            "cantidad": 45,
+            "disminucion": false
+        },
+        {
+            "año": 2020,
+            "mes": 2,
+            "dpto_hecho": "AREQUIPA",
+            "prov_hecho": "AREQUIPA",
+            "dist_hecho": "CERRO COLORADO",
+            "cantidad": 35,
+            "disminucion": true
+        },
+        {
+            "año": 2018,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "LIMA",
+            "dist_hecho": "ATE",
+            "cantidad": 150,
+            "disminucion": false
+        },
+        {
+            "año": 2018,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "LIMA",
+            "dist_hecho": "SAN JUAN DE LURIGANCHO",
+            "cantidad": 200,
+            "disminucion": false
+        },
+        {
+            "año": 2019,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "LIMA",
+            "dist_hecho": "ATE",
+            "cantidad": 160,
+            "disminucion": false
+        },
+        {
+            "año": 2019,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "LIMA",
+            "dist_hecho": "SAN JUAN DE LURIGANCHO",
+            "cantidad": 210,
+            "disminucion": false
+        },
+        {
+            "año": 2020,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "LIMA",
+            "dist_hecho": "ATE",
+            "cantidad": 140,
+            "disminucion": true
+        },
+        {
+            "año": 2020,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "LIMA",
+            "dist_hecho": "SAN JUAN DE LURIGANCHO",
+            "cantidad": 190,
+            "disminucion": true
+        },
+        {
+            "año": 2021,
+            "mes": 1,
+            "dpto_hecho": "AMAZONAS",
+            "prov_hecho": "BAGUA",
+            "dist_hecho": "BAGUA",
+            "cantidad": 20,
+            "disminucion": false
+        },
+        {
+            "año": 2021,
+            "mes": 2,
+            "dpto_hecho": "AREQUIPA",
+            "prov_hecho": "AREQUIPA",
+            "dist_hecho": "CERRO COLORADO",
+            "cantidad": 38,
+            "disminucion": false
+        },
+        {
+            "año": 2021,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "LIMA",
+            "dist_hecho": "ATE",
+            "cantidad": 155,
+            "disminucion": false
+        },
+        {
+            "año": 2021,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "LIMA",
+            "dist_hecho": "SAN JUAN DE LURIGANCHO",
+            "cantidad": 205,
+            "disminucion": false
+        },
+        {
+            "año": 2022,
+            "mes": 1,
+            "dpto_hecho": "AMAZONAS",
+            "prov_hecho": "UTCUBAMBA",
+            "dist_hecho": "BAGUA GRANDE",
+            "cantidad": 15,
+            "disminucion": true
+        },
+        {
+            "año": 2022,
+            "mes": 2,
+            "dpto_hecho": "AREQUIPA",
+            "prov_hecho": "CAYLLOMA",
+            "dist_hecho": "MAJES",
+            "cantidad": 25,
+            "disminucion": true
+        },
+        {
+            "año": 2022,
+            "mes": 3,
+            "dpto_hecho": "LIMA",
+            "prov_hecho": "HUARAL",
+            "dist_hecho": "HUARAL",
+            "cantidad": 80,
+            "disminucion": true
+        }
+    ]
+}
