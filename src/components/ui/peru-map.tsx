@@ -8,12 +8,14 @@ type PeruMapProps = {
   geojson: PeruGeoJson;
   selectedDepartment: DepartmentFeature | null;
   onSelectDepartment: (feature: DepartmentFeature) => void;
+  colorizer: (departmentId: string) => string;
 };
 
 export function PeruMap({
   geojson,
   selectedDepartment,
   onSelectDepartment,
+  colorizer,
 }: PeruMapProps) {
   const { paths, width, height } = useMemo(() => {
     if (!geojson.features || geojson.features.length === 0) {
@@ -99,12 +101,15 @@ export function PeruMap({
               key={feature.properties.NOMBDEP}
               d={feature.path}
               className={cn(
-                "stroke-background/50 stroke-[0.5] transition-all duration-200 ease-in-out cursor-pointer",
+                "stroke-background/50 stroke-[0.5] transition-all duration-200 ease-in-out cursor-pointer hover:stroke-accent-foreground hover:stroke-2",
                 selectedDepartment?.properties.NOMBDEP ===
                   feature.properties.NOMBDEP
-                  ? "fill-accent stroke-background"
-                  : "fill-primary hover:fill-primary/80"
+                  ? "stroke-accent-foreground stroke-2"
+                  : ""
               )}
+              style={{
+                  fill: selectedDepartment?.properties.NOMBDEP === feature.properties.NOMBDEP ? 'hsl(var(--accent))' : colorizer(feature.properties.FIRST_IDDP)
+              }}
               onClick={() => onSelectDepartment(feature)}
             >
               <title>{feature.properties.NOMBDEP}</title>

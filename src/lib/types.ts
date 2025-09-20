@@ -15,7 +15,7 @@ export interface CrimeDataPoint {
 }
 
 export interface Region {
-  id: string;
+  id: string; // Corresponds to FIRST_IDDP in GeoJSON
   name: string;
   lat: number;
   lng: number;
@@ -54,13 +54,13 @@ export interface CrimeLocationDetail {
   count: number;
 }
 
+
 export type DepartmentProperties = {
   NOMBDEP: string;
   COUNT: number;
   FIRST_IDDP: string;
   HECTARES: number;
-  crimeIndex: number;
-  policeCount: number;
+  id: string; // Add id to match region data
 };
 
 export type DepartmentGeometry = {
@@ -75,7 +75,7 @@ export type DepartmentFeature = {
   type: "Feature";
   properties: DepartmentProperties;
   geometry: DepartmentGeometry;
-  path?: string; // Add optional path property for pre-calculated SVG paths
+  path?: string; 
 };
 
 export type PeruGeoJson = {

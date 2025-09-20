@@ -7,72 +7,83 @@ import type { DepartmentFeature, PeruGeoJson, Region } from "@/lib/types";
 import peruGeoJsonData from "@/lib/peru.json";
 import { PeruMap } from "../ui/peru-map";
 import { regions as allRegionsData } from "@/lib/data"; // Importamos todos los datos de regiones
-import { cn } from "@/lib/utils";
 
 const peruGeoJson = peruGeoJsonData as PeruGeoJson;
+
+// Helper to normalize names
+const removeAccents = (str: string) => {
+  if (!str) return '';
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase();
+};
 
 interface PeruExplorerClientProps {
   onSelectRegion: (region: Region | null) => void;
   selectedRegion: Region | null;
-  // Puedes pasar el viewType aquí si quieres colorear el mapa
   viewType?: 'crimes' | 'heroes' | 'trust' | 'gender';
-  // Y los datos para esa vista si son diferentes
-  regions?: (Region & { count: number })[];
+  regions: (Region & { count: number })[];
 }
 
 export default function PeruExplorerClient({
   onSelectRegion,
   selectedRegion,
   viewType = 'crimes',
-  regions = allRegionsData.map(r => ({ ...r, count: 0 })), // Usa un array por defecto
+  regions,
 }: PeruExplorerClientProps) {
   const [selectedDepartment, setSelectedDepartment] =
     useState<DepartmentFeature | null>(null);
 
-  // Sincroniza el estado del mapa con la prop `selectedRegion`
   useEffect(() => {
     if (selectedRegion) {
-      const dept = peruGeoJson.features.find(f => f.properties.id === selectedRegion.id);
-      setSelectedDepartment(dept as DepartmentFeature);
+      const dept = peruGeoJson.features.find(f => f.properties.FIRST_IDDP === selectedRegion.id);
+      if(dept) {
+        setSelectedDepartment(dept);
+      }
     } else {
       setSelectedDepartment(null);
     }
   }, [selectedRegion]);
 
-  // Lógica para manejar el clic en el mapa y notificar al componente padre
   const handleSelectDepartment = (department: DepartmentFeature | null) => {
     setSelectedDepartment(department);
     if (department) {
-      const region = allRegionsData.find(r => r.id === department.properties.id);
+      const region = allRegionsData.find(r => r.id === department.properties.FIRST_IDDP);
       onSelectRegion(region || null);
     } else {
       onSelectRegion(null);
     }
   };
 
-  // Lógica para colorear el mapa (similar a la anterior)
   const mapData = useMemo(() => {
     const maxCount = Math.max(...regions.map(r => r.count), 0);
-    return regions.reduce((acc, region) => {
-      let color = '#D1D5DB'; // Color por defecto
-      let value = region.count;
+    const regionDataMap = regions.reduce((acc, region) => {
+        const normalizedName = removeAccents(region.name);
+        acc[normalizedName] = { count: region.count, id: region.id };
+        return acc;
+    }, {} as Record<string, { count: number, id: string }>);
 
+    return allRegionsData.reduce((acc, region) => {
+      let color = '#D1D5DB';
+      const normalizedRegionName = removeAccents(region.name);
+      const data = regionDataMap[normalizedRegionName];
+      const value = data ? data.count : 0;
+      
       if (maxCount > 0) {
-        const normalized = value / maxCount;
+        const normalizedValue = value / maxCount;
         switch (viewType) {
-          case 'crimes': color = `hsl(10 70% ${50 - normalized * 30}%)`; break;
-          case 'heroes': color = `hsl(120 70% ${50 - normalized * 30}%)`; break;
-          case 'trust': color = `hsl(210 70% ${50 - normalized * 30}%)`; break;
-          case 'gender': color = `hsl(280 70% ${50 - normalized * 30}%)`; break;
+          case 'crimes': color = `hsl(0 80% ${90 - normalizedValue * 40}%)`; break;
+          case 'heroes': color = `hsl(120 70% ${90 - normalizedValue * 40}%)`; break;
+          case 'trust': color = `hsl(210 80% ${90 - normalizedValue * 40}%)`; break;
+          case 'gender': color = `hsl(280 70% ${90 - normalizedValue * 40}%)`; break;
         }
       }
+      
       acc[region.id] = { color, value };
       return acc;
     }, {} as Record<string, { color: string, value: number }>);
   }, [regions, viewType]);
 
   const getColorForDepartment = (departmentId: string): string => {
-    return mapData[departmentId]?.color || '#D1D5DB';
+    return mapData[departmentId]?.color || '#E5E7EB'; // Default to a light gray
   };
 
   return (
