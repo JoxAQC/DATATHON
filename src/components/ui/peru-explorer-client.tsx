@@ -8,6 +8,7 @@ import peruGeoJsonData from "@/lib/peru.json";
 import { PeruMap } from "../ui/peru-map";
 import { regions as allRegionsData } from "@/lib/data"; // Importamos todos los datos de regiones
 import { Card, CardContent, CardHeader, CardTitle } from "./card";
+import { Shield } from "lucide-react";
 
 const peruGeoJson = peruGeoJsonData as PeruGeoJson;
 
@@ -42,7 +43,7 @@ export default function PeruExplorerClient({
 
   useEffect(() => {
     if (selectedRegion) {
-      const dept = peruGeoJson.features.find(f => f.properties.FIRST_IDDP === selectedRegion.id);
+      const dept = peruGeoJson.features.find(f => removeAccents(f.properties.NOMBDEP) === removeAccents(selectedRegion.name));
       if(dept) {
         setSelectedDepartment(dept);
       }
@@ -54,7 +55,7 @@ export default function PeruExplorerClient({
   const handleSelectDepartment = (department: DepartmentFeature | null) => {
     setSelectedDepartment(department);
     if (department) {
-      const region = allRegionsData.find(r => r.id === department.properties.FIRST_IDDP);
+      const region = allRegionsData.find(r => removeAccents(r.name) === removeAccents(department.properties.NOMBDEP));
       onSelectRegion(region || null);
     } else {
       onSelectRegion(null);
@@ -120,7 +121,10 @@ export default function PeruExplorerClient({
             {topRegions.map((region, index) => (
               <li key={region.id} className="flex justify-between items-center">
                 <span className="font-semibold">{index + 1}. {region.name}</span>
-                <span className="font-bold text-primary">{region.count.toLocaleString()}{currentViewConfig.unit}</span>
+                <span className="font-bold text-primary flex items-center gap-1">
+                  {viewType === 'heroes' && <Shield className="h-4 w-4" />}
+                  {region.count.toLocaleString()}{currentViewConfig.unit}
+                </span>
               </li>
             ))}
           </ul>

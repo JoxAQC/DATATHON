@@ -43,14 +43,22 @@ export default function CrimeDashboard({
 
   const crimeDataForMap = useMemo(() => {
     const dataForYear = crimeDataByYear[latestYear]?.total_crimes_by_location || [];
-    
+    const crimeCounts: Record<string, number> = {};
+
+    dataForYear.forEach(item => {
+        const normalizedRegionName = removeAccents(item.dpto_pjfs).toUpperCase();
+        if(!crimeCounts[normalizedRegionName]) {
+            crimeCounts[normalizedRegionName] = 0;
+        }
+        crimeCounts[normalizedRegionName] += item.cantidad;
+    });
+
     return allRegions.map(region => {
       const normalizedRegionName = removeAccents(region.name).toUpperCase();
-      const regionData = dataForYear.filter(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
-      
       let count = 0;
+
       if (selectedCrimeType === 'All') {
-        count = regionData.reduce((acc, current) => acc + current.cantidad, 0);
+        count = crimeCounts[normalizedRegionName] || 0;
       } else {
         const regionCrimes = allCrimeData.filter(d => 
             removeAccents(d.region).toUpperCase() === normalizedRegionName && 
@@ -59,6 +67,7 @@ export default function CrimeDashboard({
         );
         count = regionCrimes.reduce((acc, crime) => acc + crime.count, 0);
       }
+
       return {
         ...region,
         count,
@@ -147,10 +156,11 @@ export default function CrimeDashboard({
     linkElement.click();
   };
 
-  const mostCommonCrimesInView = selectedRegion ? selectedRegion.mostCommonCrimes : ['Aggravated Robbery', 'Homicide', 'Assault', 'Extortion'];
-
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} orientation="vertical" className="flex h-screen w-full bg-background font-body">
+    <Tabs value={activeTab} onValueChange={(tab) => {
+        setActiveTab(tab);
+        setSelectedRegion(null);
+    }} orientation="vertical" className="flex h-screen w-full bg-background font-body">
       <aside className="w-24 flex-shrink-0 bg-card p-4 flex flex-col items-center justify-center z-20 comic-panel">
          <TabsList className="bg-transparent flex-col gap-4 h-full">
             <TabsTrigger value="map" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
@@ -188,7 +198,6 @@ export default function CrimeDashboard({
         onSelectRegion={handleSelectRegion}
         selectedCrimeType={selectedCrimeType}
         onSelectCrimeType={handleSelectCrimeType}
-        mostCommonCrimes={mostCommonCrimesInView}
         onExport={handleExportData}
         allRegions={allRegions}
         crimeDataByYear={crimeDataByYear}

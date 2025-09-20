@@ -1,15 +1,11 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import type { Region, CrimeType, CrimeDataPoint, CrimeLocationDetail, TrustData, GenderViolenceCase } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Download, Search, X } from 'lucide-react';
+import { Download, Search, X, Shield } from 'lucide-react';
 import RegionSummary from './region-summary';
-import RobberyIcon from '../icons/robbery-icon';
-import HomicideIcon from '../icons/homicide-icon';
-import AssaultIcon from '../icons/assault-icon';
-import ExtortionIcon from '../icons/extortion-icon';
 import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
 import { getCrimeTypeFromQuery } from '@/lib/actions';
@@ -20,28 +16,8 @@ import { Line, LineChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Tool
 import { ChartContainer, ChartTooltipContent } from '../ui/chart';
 import TrustLevelChart from './trust-level-chart';
 import GenderViolenceChart from './gender-violence-chart';
-
-interface DashboardSidebarProps {
-  activeTab: string;
-  selectedRegion: Region | null;
-  onSelectRegion: (region: Region | null) => void;
-  selectedCrimeType: CrimeType | 'All';
-  onSelectCrimeType: (crimeType: CrimeType | 'All') => void;
-  mostCommonCrimes: CrimeType[];
-  onExport: () => void;
-  allRegions: Region[];
-  crimeDataByYear: Record<string, { total_crimes_by_location: any[], crimes_by_type_and_location: any[] }>;
-  allCrimeData: CrimeDataPoint[];
-  trustData: TrustData[];
-  genderViolenceData: GenderViolenceCase[];
-}
-
-const iconMap: Record<CrimeType, React.ComponentType<any>> = {
-  'Aggravated Robbery': RobberyIcon,
-  'Homicide': HomicideIcon,
-  'Assault': AssaultIcon,
-  'Extortion': ExtortionIcon,
-};
+import crimeTypesByRegionData from '@/lib/crime-types-by-region.json';
+import heroesData from '@/lib/heroes.json';
 
 // Helper function to remove accents
 const removeAccents = (str: string) => {
@@ -91,6 +67,18 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
       
     return Object.values(details).sort((a,b) => b.count - a.count);
   }, [region, crimeDataByYear]);
+
+  const heroesByDistrict = useMemo(() => {
+    const normalizedRegionName = removeAccents(region.name).toUpperCase();
+    return heroesData.police_by_location
+      .filter(hero => removeAccents(hero.departamento).toUpperCase() === normalizedRegionName)
+      .map(hero => ({
+        district: hero.distrito,
+        province: hero.provincia,
+        count: hero.cantidad
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [region]);
 
   const regionWithStats: Region = {
     ...region,
@@ -181,7 +169,28 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
           )}
 
           {activeTab === 'heroes' && (
-              <p className="text-muted-foreground p-4 text-center">No additional details for Heroes view.</p>
+              <div>
+                <h3 className="font-headline text-lg text-primary/90">Police Presence by District</h3>
+                <Card className="max-h-96 overflow-y-auto comic-panel">
+                  <CardContent className="p-2">
+                    {heroesByDistrict.length > 0 ? (
+                      <ul className="space-y-2">
+                        {heroesByDistrict.map((hero, index) => (
+                          <li key={index} className="flex items-center justify-between text-sm p-2 border-b last:border-b-0">
+                            <span className="font-semibold">{hero.district}</span>
+                            <span className="font-bold text-green-600 flex items-center gap-1">
+                              <Shield className="h-4 w-4" />
+                              {hero.count.toLocaleString()}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground p-4 text-center">No detailed data available for Heroes in this region.</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
           )}
 
           {activeTab === 'gender-violence' && (
@@ -191,7 +200,7 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
             />
           )}
 
-          {activeTab === 'trust' && (
+          {activeTab === 'trust' && regionalTrustData.length > 0 && (
             <div>
               <h3 className="font-headline text-lg text-primary/90">Public Trust</h3>
               <TrustLevelChart data={regionalTrustData} />
@@ -210,7 +219,6 @@ export default function DashboardSidebar({
   onSelectRegion,
   selectedCrimeType,
   onSelectCrimeType,
-  mostCommonCrimes,
   onExport,
   allRegions,
   crimeDataByYear,
@@ -220,7 +228,35 @@ export default function DashboardSidebar({
 }: DashboardSidebarProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearching, setIsSearching] = useState(false);
+  const [mostCommonCrimes, setMostCommonCrimes] = useState<string[]>([]);
   const { toast } = useToast();
+
+  useEffect(() => {
+    if (selectedRegion && activeTab === 'map') {
+      const normalizedRegionName = removeAccents(selectedRegion.name).toUpperCase();
+      const regionCrimes = crimeTypesByRegionData['2023']
+        .filter(crime => removeAccents(crime.dpto_pjfs).toUpperCase() === normalizedRegionName);
+
+      const crimeCounts: Record<string, number> = {};
+      regionCrimes.forEach(crime => {
+        if (crime.des_articulo in crimeCounts) {
+          crimeCounts[crime.des_articulo] += crime.cantidad;
+        } else {
+          crimeCounts[crime.des_articulo] = crime.cantidad;
+        }
+      });
+      
+      const sortedCrimes = Object.entries(crimeCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(entry => entry[0]);
+        
+      setMostCommonCrimes(sortedCrimes);
+    } else {
+      setMostCommonCrimes(CRIME_TYPES);
+    }
+  }, [selectedRegion, activeTab]);
+
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -231,9 +267,9 @@ export default function DashboardSidebar({
     setIsSearching(false);
 
     if (result.success && result.crimeType) {
-        const foundCrimeType = CRIME_TYPES.find(ct => result.crimeType.toLowerCase().includes(ct.toLowerCase()));
+        const foundCrimeType = mostCommonCrimes.find(ct => result.crimeType.toLowerCase().includes(ct.toLowerCase()));
         if (foundCrimeType) {
-            onSelectCrimeType(foundCrimeType);
+            onSelectCrimeType(foundCrimeType as CrimeType);
             toast({ title: "Filter Applied", description: `Showing results for ${foundCrimeType}.` });
         } else {
             toast({ variant: "destructive", title: "Filter Not Found", description: `Could not find a matching crime type for "${result.crimeType}".` });
@@ -290,14 +326,22 @@ export default function DashboardSidebar({
           />
         ) : (
           <div className="flex-1 flex flex-col justify-center text-center space-y-4">
-            <div>
-              <h2 className="font-headline text-2xl text-primary">Global View</h2>
-              <p className="text-muted-foreground text-sm max-w-xs mx-auto">Click a region on the map for details or use the filters below to explore data across Peru.</p>
-            </div>
-             <div>
-                <h3 className="font-headline text-lg text-primary/90">National Public Trust</h3>
-                <TrustLevelChart data={nationalTrustData} />
-             </div>
+             {activeTab === 'trust' && (
+                <>
+                  <h2 className="font-headline text-2xl text-primary">Global View</h2>
+                  <p className="text-muted-foreground text-sm max-w-xs mx-auto">Click a region on the map for details or use the filters below to explore data across Peru.</p>
+                  <div>
+                      <h3 className="font-headline text-lg text-primary/90">National Public Trust</h3>
+                      <TrustLevelChart data={nationalTrustData} />
+                  </div>
+                </>
+             )}
+             {activeTab !== 'trust' && (
+                <div>
+                    <h2 className="font-headline text-2xl text-primary">Global View</h2>
+                    <p className="text-muted-foreground text-sm max-w-xs mx-auto">Click a region on the map for details or use the filters below to explore data across Peru.</p>
+                </div>
+             )}
           </div>
         )}
       </div>
@@ -311,16 +355,14 @@ export default function DashboardSidebar({
             </h3>
             <div className="grid grid-cols-2 gap-2 mb-4">
               {mostCommonCrimes.map((crime) => {
-                const Icon = iconMap[crime];
                 const isActive = selectedCrimeType === crime;
                 return (
                   <Button
                     key={crime}
                     variant={isActive ? 'default' : 'outline'}
                     className="h-auto flex flex-col items-center p-2 gap-1 text-center comic-panel"
-                    onClick={() => onSelectCrimeType(isActive ? 'All' : crime)}
+                    onClick={() => onSelectCrimeType(isActive ? 'All' : crime as CrimeType)}
                   >
-                    {Icon && <Icon className="w-8 h-8" />}
                     <span className="text-xs font-semibold">{crime}</span>
                   </Button>
                 );
