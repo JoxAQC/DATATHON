@@ -46,3 +46,32 @@ export interface CrimeLocationDetail {
   district: string;
   count: number;
 }
+
+export type DepartmentProperties = {
+  NOMBDEP: string;
+  COUNT: number;
+  FIRST_IDDP: string;
+  HECTARES: number;
+  crimeIndex: number;
+  policeCount: number;
+};
+
+export type DepartmentGeometry = {
+  type: "Polygon";
+  coordinates: number[][][];
+} | {
+  type: "MultiPolygon";
+  coordinates: number[][][][];
+};
+
+export type DepartmentFeature = {
+  type: "Feature";
+  properties: DepartmentProperties;
+  geometry: DepartmentGeometry;
+  path?: string; // Add optional path property for pre-calculated SVG paths
+};
+
+export type PeruGeoJson = {
+  type: "FeatureCollection";
+  features: DepartmentFeature[];
+};
