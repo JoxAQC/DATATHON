@@ -161,26 +161,26 @@ export default function CrimeDashboard({
         setActiveTab(tab);
         setSelectedRegion(null);
     }} orientation="vertical" className="flex h-screen w-full bg-background font-body">
-      <aside className="w-24 flex-shrink-0 bg-card p-4 flex flex-col items-center justify-center z-20 comic-panel">
-         <TabsList className="bg-transparent flex-col gap-4 h-full">
-            <TabsTrigger value="map" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <Map className="mb-1 h-7 w-7" />
-                <span>Crímenes</span>
-            </TabsTrigger>
-            <TabsTrigger value="heroes" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <ShieldCheck className="mb-1 h-7 w-7" />
-                <span>Héroes</span>
-            </TabsTrigger>
-            <TabsTrigger value="gender-violence" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <BarChart className="mb-1 h-7 w-7" />
-                <span>Género</span>
-            </TabsTrigger>
-            <TabsTrigger value="trust" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <Shield className="mb-1 h-7 w-7" />
-                <span>Confianza</span>
-            </TabsTrigger>
-        </TabsList>
-      </aside>
+<aside className="w-24 flex-shrink-0 bg-card p-4 flex flex-col items-center justify-center z-20 comic-panel">
+  <TabsList className="bg-transparent flex-col gap-4 h-full">
+    <TabsTrigger value="map" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
+      <img src="icono_mapa_crimenes.png" alt="Crímenes" className="mb-1 h-10 w-10" />
+      <span>Crímenes</span>
+    </TabsTrigger>
+    <TabsTrigger value="heroes" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
+      <img src="icono_policia.png" alt="Héroes" className="mb-1 h-10 w-10" />
+      <span>Héroes</span>
+    </TabsTrigger>
+    <TabsTrigger value="gender-violence" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
+      <img src="icono_violencia_genero.png" alt="Violencia de Género" className="mb-1 h-10 w-10" />
+      <span>Género</span>
+    </TabsTrigger>
+    <TabsTrigger value="trust" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
+      <img src="icono_confianza.png" alt="Confianza" className="mb-1 h-10 w-10" />
+      <span>Confianza</span>
+    </TabsTrigger>
+  </TabsList>
+</aside>
       
       <MainContent
         activeTab={activeTab}
