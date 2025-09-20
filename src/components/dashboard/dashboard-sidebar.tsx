@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import type { Region, CrimeType, CrimeDataPoint, CrimeLocationDetail, TrustData, GenderViolenceCase } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Download, Search, X } from 'lucide-react';
+import { Download, Search, X, Shield } from 'lucide-react';
 import RegionSummary from './region-summary';
 import { cn } from '@/lib/utils';
 import { Input } from '../ui/input';
@@ -17,6 +17,7 @@ import { ChartContainer, ChartTooltipContent } from '../ui/chart';
 import TrustLevelChart from './trust-level-chart';
 import GenderViolenceChart from './gender-violence-chart';
 import crimeTypesByRegionData from '@/lib/crime-types-by-region.json';
+import heroesData from '@/lib/heroes.json';
 
 // Helper function to remove accents
 const removeAccents = (str: string) => {
@@ -66,6 +67,18 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
       
     return Object.values(details).sort((a,b) => b.count - a.count);
   }, [region, crimeDataByYear]);
+
+  const heroesByDistrict = useMemo(() => {
+    const normalizedRegionName = removeAccents(region.name).toUpperCase();
+    return heroesData.police_by_location
+      .filter(hero => removeAccents(hero.departamento).toUpperCase() === normalizedRegionName)
+      .map(hero => ({
+        district: hero.distrito,
+        province: hero.provincia,
+        count: hero.cantidad
+      }))
+      .sort((a, b) => b.count - a.count);
+  }, [region]);
 
   const regionWithStats: Region = {
     ...region,
@@ -156,7 +169,28 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
           )}
 
           {activeTab === 'heroes' && (
-              <p className="text-muted-foreground p-4 text-center">No additional details for Heroes view.</p>
+              <div>
+                <h3 className="font-headline text-lg text-primary/90">Police Presence by District</h3>
+                <Card className="max-h-96 overflow-y-auto comic-panel">
+                  <CardContent className="p-2">
+                    {heroesByDistrict.length > 0 ? (
+                      <ul className="space-y-2">
+                        {heroesByDistrict.map((hero, index) => (
+                          <li key={index} className="flex items-center justify-between text-sm p-2 border-b last:border-b-0">
+                            <span className="font-semibold">{hero.district}</span>
+                            <span className="font-bold text-green-600 flex items-center gap-1">
+                              <Shield className="h-4 w-4" />
+                              {hero.count.toLocaleString()}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <p className="text-muted-foreground p-4 text-center">No detailed data available for Heroes in this region.</p>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
           )}
 
           {activeTab === 'gender-violence' && (
@@ -166,8 +200,9 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
             />
           )}
 
-          {activeTab === 'trust' && (
+          {activeTab === 'trust' && regionalTrustData.length > 0 && (
             <div>
+              <h3 className="font-headline text-lg text-primary/90">Public Trust</h3>
               <TrustLevelChart data={regionalTrustData} />
             </div>
           )}
