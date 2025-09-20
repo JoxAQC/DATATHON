@@ -18,7 +18,7 @@ const removeAccents = (str: string) => {
 
 const chartConfig = {
   cases: {
-    label: "Femicide Cases",
+    label: "Casos de violencia de género",
     color: "hsl(var(--destructive))",
   },
 } satisfies ChartConfig;
@@ -110,10 +110,10 @@ export default function GenderViolenceChart({ region, allData }: GenderViolenceC
 
   return (
     <div className="space-y-4">
-      <Card className="flex flex-col comic-panel">
+      <Card className="flex flex-col comic-panel" style={{ width:'300px' }}>
         <CardHeader>
-          <CardTitle className="font-headline text-primary">Gender Violence Trend</CardTitle>
-          <CardDescription>Reported femicide cases in {region.name}.</CardDescription>
+          <CardTitle className="font-headline text-primary">Casos de violencia de género</CardTitle>
+          <CardDescription>Casos de violencia contra la mujer en {region.name}.</CardDescription>
         </CardHeader>
         <CardContent className="flex-1 h-48">
           <ChartContainer config={chartConfig} className="h-full w-full">
@@ -143,10 +143,10 @@ export default function GenderViolenceChart({ region, allData }: GenderViolenceC
         </CardContent>
       </Card>
       {districtData.data.length > 0 && (
-        <Card className="flex flex-col comic-panel">
+        <Card className="flex flex-col comic-panel" style={{ width:'300px' }}>
             <CardHeader>
-                <CardTitle className="font-headline text-primary text-lg">Top Districts Trend</CardTitle>
-                <CardDescription>Historical cases for top 3 districts in {region.name}.</CardDescription>
+                <CardTitle className="font-headline text-primary text-lg">Distritos con más casos</CardTitle>
+                <CardDescription>Casos históricos de distritos en {region.name}.</CardDescription>
             </CardHeader>
             <CardContent className="flex-1 h-56">
                 <ChartContainer config={districtData.config} className="h-full w-full">
