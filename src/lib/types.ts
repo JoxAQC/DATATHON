@@ -1,4 +1,4 @@
-export type CrimeType = 'Aggravated Robbery' | 'Homicide' | 'Assault' | 'Extortion';
+export type CrimeType = 'Aggravated Robbery' | 'Homicide' | 'Assault' | 'Extortion' | 'HURTO' | 'LESIONES' | 'ROBO' | 'AMENAZAS' | 'HURTO AGRAVADO' | 'ROBO AGRAVADO' | 'VIOLENCIA FAMILIAR' | 'CONDUCCIÓN EN EBRIEDAD' | 'ESTAFA' | 'VIOLENCIA CONTRA LA MUJER';
 
 export const CRIME_TYPES: CrimeType[] = ['Aggravated Robbery', 'Homicide', 'Assault', 'Extortion'];
 
@@ -82,3 +82,9 @@ export type PeruGeoJson = {
   type: "FeatureCollection";
   features: DepartmentFeature[];
 };
+
+export interface CrimeTypeByRegion {
+    dpto_pjfs: string;
+    des_articulo: string;
+    cantidad: number;
+}

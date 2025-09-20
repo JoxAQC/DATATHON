@@ -1,0 +1,84 @@
+{
+    "2023": [
+        {
+            "dpto_pjfs": "AMAZONAS",
+            "des_articulo": "HURTO",
+            "cantidad": 150
+        },
+        {
+            "dpto_pjfs": "AMAZONAS",
+            "des_articulo": "LESIONES",
+            "cantidad": 120
+        },
+        {
+            "dpto_pjfs": "AMAZONAS",
+            "des_articulo": "ROBO",
+            "cantidad": 80
+        },
+        {
+            "dpto_pjfs": "AMAZONAS",
+            "des_articulo": "AMENAZAS",
+            "cantidad": 60
+        },
+        {
+            "dpto_pjfs": "ÁNCASH",
+            "des_articulo": "HURTO AGRAVADO",
+            "cantidad": 300
+        },
+        {
+            "dpto_pjfs": "ÁNCASH",
+            "des_articulo": "ROBO AGRAVADO",
+            "cantidad": 250
+        },
+        {
+            "dpto_pjfs": "ÁNCASH",
+            "des_articulo": "VIOLENCIA FAMILIAR",
+            "cantidad": 200
+        },
+        {
+            "dpto_pjfs": "ÁNCASH",
+            "des_articulo": "CONDUCCIÓN EN EBRIEDAD",
+            "cantidad": 150
+        },
+        {
+            "dpto_pjfs": "AREQUIPA",
+            "des_articulo": "HURTO AGRAVADO",
+            "cantidad": 500
+        },
+        {
+            "dpto_pjfs": "AREQUIPA",
+            "des_articulo": "ROBO AGRAVADO",
+            "cantidad": 450
+        },
+        {
+            "dpto_pjfs": "AREQUIPA",
+            "des_articulo": "ESTAFA",
+            "cantidad": 300
+        },
+        {
+            "dpto_pjfs": "AREQUIPA",
+            "des_articulo": "VIOLENCIA CONTRA LA MUJER",
+            "cantidad": 250
+        },
+        {
+            "dpto_pjfs": "LIMA",
+            "des_articulo": "ROBO AGRAVADO",
+            "cantidad": 1200
+        },
+        {
+            "dpto_pjfs": "LIMA",
+            "des_articulo": "HURTO AGRAVADO",
+            "cantidad": 1000
+        },
+        {
+            "dpto_pjfs": "LIMA",
+            "des_articulo": "EXTORSIÓN",
+            "cantidad": 800
+        },
+        {
+            "dpto_pjfs": "LIMA",
+            "des_articulo": "HOMICIDIO",
+            "cantidad": 500
+        }
+    ]
+}
