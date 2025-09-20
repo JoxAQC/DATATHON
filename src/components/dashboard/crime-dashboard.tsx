@@ -5,15 +5,13 @@ import type { Region, CrimeDataPoint, GenderViolenceData, TrustData, CrimeType }
 import DashboardSidebar from './dashboard-sidebar';
 import MainContent from './main-content';
 import Chatbot from './chatbot';
-import { crimeDataByYear, allCrimeData, regions as allRegions } from '@/lib/data';
+import { crimeDataByYear, allCrimeData, regions as allRegions, trustData as allTrustData, genderViolenceData as allGenderViolenceData } from '@/lib/data';
 import heroesData from '@/lib/heroes.json';
 import { Map, ShieldCheck, BarChart, Shield } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs';
 import { cn } from '@/lib/utils';
 
 interface CrimeDashboardProps {
-  genderViolenceData: GenderViolenceData[];
-  trustData: TrustData[];
 }
 
 // Helper function to remove accents
@@ -23,8 +21,6 @@ const removeAccents = (str: string) => {
 };
 
 export default function CrimeDashboard({
-  genderViolenceData,
-  trustData,
 }: CrimeDashboardProps) {
   const [selectedRegion, setSelectedRegion] = useState<Region | null>(null);
   const [selectedCrimeType, setSelectedCrimeType] = useState<CrimeType | 'All'>('All');
@@ -49,12 +45,12 @@ export default function CrimeDashboard({
     const dataForYear = crimeDataByYear[latestYear]?.total_crimes_by_location || [];
     
     return allRegions.map(region => {
-      let count = 0;
       const normalizedRegionName = removeAccents(region.name).toUpperCase();
+      const regionData = dataForYear.filter(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
       
+      let count = 0;
       if (selectedCrimeType === 'All') {
-        const regionData = dataForYear.find(d => removeAccents(d.dpto_pjfs).toUpperCase() === normalizedRegionName);
-        count = regionData ? regionData.cantidad : 0;
+        count = regionData.reduce((acc, current) => acc + current.cantidad, 0);
       } else {
         const regionCrimes = allCrimeData.filter(d => 
             removeAccents(d.region).toUpperCase() === normalizedRegionName && 
@@ -68,7 +64,7 @@ export default function CrimeDashboard({
         count,
       };
     });
-  }, [selectedCrimeType, latestYear, allCrimeData]);
+  }, [selectedCrimeType, latestYear]);
 
   const heroesDataForMap = useMemo(() => {
     const heroesByRegion = heroesData.police_by_location.reduce((acc, hero) => {
@@ -83,6 +79,52 @@ export default function CrimeDashboard({
     return allRegions.map(region => {
       const normalizedRegionName = removeAccents(region.name).toUpperCase();
       const count = heroesByRegion[normalizedRegionName] || 0;
+      return {
+        ...region,
+        count,
+      };
+    });
+  }, []);
+  
+  const trustDataForMap = useMemo(() => {
+    const latestYearData = allTrustData.filter(d => d.name === 'Trust in Police').sort((a, b) => b.year - a.year);
+    const latestYear = latestYearData.length > 0 ? latestYearData[0].year : new Date().getFullYear();
+
+    const trustByRegion = latestYearData.filter(d => d.year === latestYear).reduce((acc, item) => {
+        if(item.region && item.region !== 'NACIONAL'){
+            const regionName = removeAccents(item.region).toUpperCase();
+            acc[regionName] = item.value;
+        }
+        return acc;
+    }, {} as Record<string, number>);
+
+
+    return allRegions.map(region => {
+        const normalizedRegionName = removeAccents(region.name).toUpperCase();
+        const count = trustByRegion[normalizedRegionName] || 0;
+        return {
+            ...region,
+            count,
+        };
+    });
+  }, []);
+
+  const genderViolenceDataForMap = useMemo(() => {
+    const latestYear = Math.max(...allGenderViolenceData.map(d => d.año));
+    const dataForYear = allGenderViolenceData.filter(d => d.año === latestYear);
+
+    const violenceByRegion = dataForYear.reduce((acc, item) => {
+      const regionName = removeAccents(item.dpto_hecho).toUpperCase();
+      if (!acc[regionName]) {
+        acc[regionName] = 0;
+      }
+      acc[regionName] += item.cantidad;
+      return acc;
+    }, {} as Record<string, number>);
+
+    return allRegions.map(region => {
+      const normalizedRegionName = removeAccents(region.name).toUpperCase();
+      const count = violenceByRegion[normalizedRegionName] || 0;
       return {
         ...region,
         count,
@@ -112,17 +154,20 @@ export default function CrimeDashboard({
       <aside className="w-24 flex-shrink-0 bg-card p-4 flex flex-col items-center justify-center z-20 comic-panel">
          <TabsList className="bg-transparent flex-col gap-4 h-full">
             <TabsTrigger value="map" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                 <img src="/icono_mapa_crimenes.png" alt="Icono de Mapa de Crímenes" className="mr-2 h-20 w-20" />
-                {/* <span>Mapa</span> */}
+                <Map className="mb-1 h-7 w-7" />
+                <span>Crímenes</span>
             </TabsTrigger>
             <TabsTrigger value="heroes" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <img src="/icono_policia.png" alt="Icono de Mapa de Crímenes" className="mr-2 h-20 w-20" />
+                <ShieldCheck className="mb-1 h-7 w-7" />
+                <span>Héroes</span>
             </TabsTrigger>
             <TabsTrigger value="gender-violence" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <img src="/icono_violencia_genero.png" alt="Icono de Mapa de Crímenes" className="mr-2 h-20 w-20" />
+                <BarChart className="mb-1 h-7 w-7" />
+                <span>Género</span>
             </TabsTrigger>
             <TabsTrigger value="trust" className="font-headline text-lg flex-col h-20 w-20 comic-panel">
-                <img src="/icono_confianza.png" alt="Icono de Mapa de Crímenes" className="mr-2 h-20 w-20" />
+                <Shield className="mb-1 h-7 w-7" />
+                <span>Confianza</span>
             </TabsTrigger>
         </TabsList>
       </aside>
@@ -131,13 +176,14 @@ export default function CrimeDashboard({
         activeTab={activeTab}
         crimeRegions={crimeDataForMap}
         heroesRegions={heroesDataForMap}
-        genderViolenceData={genderViolenceData}
-        trustData={trustData}
+        trustRegions={trustDataForMap}
+        genderViolenceRegions={genderViolenceDataForMap}
         onSelectRegion={handleSelectRegion}
         selectedRegion={selectedRegion}
       />
       
       <DashboardSidebar
+        activeTab={activeTab}
         selectedRegion={selectedRegion}
         onSelectRegion={handleSelectRegion}
         selectedCrimeType={selectedCrimeType}
@@ -147,6 +193,8 @@ export default function CrimeDashboard({
         allRegions={allRegions}
         crimeDataByYear={crimeDataByYear}
         allCrimeData={allCrimeData}
+        trustData={allTrustData}
+        genderViolenceData={allGenderViolenceData}
       />
       
       <Chatbot />

@@ -1,5 +1,8 @@
-import type { Region, CrimeDataPoint, GenderViolenceData, TrustData, CrimeType } from './types';
+import type { Region, CrimeDataPoint, GenderViolenceCase, TrustData, CrimeType } from './types';
 import crimeJson from './total_crimes.json';
+import confianzaJson from './confianza.json';
+import genderViolenceJson from './gender-violence.json';
+
 
 // Type assertion to handle the structure of the JSON file
 const crimesByYear: Record<string, { total_crimes_by_location: any[], crimes_by_type_and_location: any[] }> = crimeJson;
@@ -19,7 +22,8 @@ export const regions: Region[] = [
   { id: 'junin', name: 'JUNÍN', lat: -11.5, lng: -75.0, zoom: 8, crimeStats: '', crimeTrends: '', mostCommonCrimes: ['Assault', 'Extortion'] },
   { id: 'la-libertad', name: 'LA LIBERTAD', lat: -8.11, lng: -79.03, zoom: 8, crimeStats: '', crimeTrends: '', mostCommonCrimes: ['Homicide', 'Extortion'] },
   { id: 'lambayeque', name: 'LAMBAYEQUE', lat: -6.7, lng: -79.9, zoom: 9, crimeStats: '', crimeTrends: '', mostCommonCrimes: ['Aggravated Robbery', 'Assault'] },
-  { id: 'lima', name: 'LIMA', lat: -12.0464, lng: -77.0428, zoom: 10, crimeStats: 'Lima has the highest number of reported crimes, with 150,000 incidents last year.', crimeTrends: 'Robbery has increased by 15% in the last quarter, while homicides have seen a slight decrease.', mostCommonCrimes: ['Aggravated Robbery', 'Assault'] },
+  { id: 'lima-metropolitana', name: 'LIMA METROPOLITANA', lat: -12.0464, lng: -77.0428, zoom: 10, crimeStats: 'Lima has the highest number of reported crimes, with 150,000 incidents last year.', crimeTrends: 'Robbery has increased by 15% in the last quarter, while homicides have seen a slight decrease.', mostCommonCrimes: ['Aggravated Robbery', 'Assault'] },
+  { id: 'region-lima', name: 'REGIÓN LIMA', lat: -12.0464, lng: -77.0428, zoom: 10, crimeStats: 'Lima has the highest number of reported crimes, with 150,000 incidents last year.', crimeTrends: 'Robbery has increased by 15% in the last quarter, while homicides have seen a slight decrease.', mostCommonCrimes: ['Aggravated Robbery', 'Assault'] },
   { id: 'loreto', name: 'LORETO', lat: -3.75, lng: -73.25, zoom: 7, crimeStats: '', crimeTrends: '', mostCommonCrimes: ['Homicide', 'Assault'] },
   { id: 'madre-de-dios', name: 'MADRE DE DIOS', lat: -12.6, lng: -69.18, zoom: 8, crimeStats: '', crimeTrends: '', mostCommonCrimes: ['Homicide', 'Extortion'] },
   { id: 'moquegua', name: 'MOQUEGUA', lat: -17.2, lng: -70.93, zoom: 9, crimeStats: '', crimeTrends: '', mostCommonCrimes: ['Aggravated Robbery', 'Assault'] },
@@ -35,18 +39,17 @@ export const regions: Region[] = [
 
 export const crimeData: CrimeDataPoint[] = [];
 
-export const genderViolenceData: GenderViolenceData[] = [
-  { year: 2019, cases: 166 },
-  { year: 2020, cases: 138 },
-  { year: 2021, cases: 146 },
-  { year: 2022, cases: 130 },
-  { year: 2023, cases: 155 },
-];
+export const genderViolenceData: GenderViolenceCase[] = genderViolenceJson.cases_by_location;
 
-export const trustData: TrustData[] = [
-  { name: 'Perception of Insecurity', value: 82 },
-  { name: 'Trust in Police', value: 35 },
-];
+
+const processedTrustData: TrustData[] = confianzaJson.visualizaciones['PORCENTAJE DE CONFIANZA EN LA PNP'].map(item => ({
+    name: 'Trust in Police',
+    value: item.valor,
+    region: item.departamento,
+    year: item.periodo
+}));
+
+export const trustData: TrustData[] = processedTrustData;
 
 export const crimeTypeDetails: Record<CrimeType, { icon: React.ComponentType<{ className?: string }>, description: string }> = {
     'Aggravated Robbery': {

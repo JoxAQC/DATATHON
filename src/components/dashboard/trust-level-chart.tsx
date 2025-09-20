@@ -29,20 +29,25 @@ interface TrustLevelChartProps {
 }
 
 export default function TrustLevelChart({ data }: TrustLevelChartProps) {
+  if (data.length === 0) {
+    return (
+      <Card className="h-full flex flex-col items-center justify-center comic-panel text-muted-foreground">
+        <p>No data available</p>
+      </Card>
+    );
+  }
+
   return (
     <Card className="h-full flex flex-col comic-panel">
-      <CardHeader>
-        <CardTitle className="font-headline text-primary">Public Trust Measurement</CardTitle>
-        <CardDescription>
-          Percentage of the public feeling insecure and their trust in law enforcement.
-        </CardDescription>
+      <CardHeader className="p-4">
+        <CardTitle className="font-headline text-primary text-xl">Public Trust</CardTitle>
       </CardHeader>
-      <CardContent className="flex-1 flex items-center justify-center gap-8">
+      <CardContent className="flex-1 flex items-center justify-center gap-4 p-2">
         {data.map((item) => (
-          <div key={item.name} className="flex flex-col items-center gap-2">
+          <div key={item.name} className="flex flex-col items-center gap-1">
             <ChartContainer
               config={chartConfig}
-              className="w-48 h-48"
+              className="w-32 h-32"
             >
               <ResponsiveContainer>
                 <RadialBarChart
@@ -51,7 +56,7 @@ export default function TrustLevelChart({ data }: TrustLevelChartProps) {
                   endAngle={270}
                   innerRadius="70%"
                   outerRadius="100%"
-                  barSize={20}
+                  barSize={15}
                 >
                   <PolarAngleAxis
                     type="number"
@@ -75,8 +80,8 @@ export default function TrustLevelChart({ data }: TrustLevelChartProps) {
               </ResponsiveContainer>
             </ChartContainer>
             <div className="text-center">
-              <p className="font-semibold text-lg">{item.value}%</p>
-              <p className="text-sm text-muted-foreground">{item.name}</p>
+              <p className="font-semibold text-base">{item.value}%</p>
+              <p className="text-xs text-muted-foreground">{item.name}</p>
             </div>
           </div>
         ))}

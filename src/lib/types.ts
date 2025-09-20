@@ -25,14 +25,21 @@ export interface Region {
   mostCommonCrimes: CrimeType[];
 }
 
-export interface GenderViolenceData {
-  year: number;
-  cases: number;
+export interface GenderViolenceCase {
+  año: number;
+  mes: number;
+  dpto_hecho: string;
+  prov_hecho: string;
+  dist_hecho: string;
+  cantidad: number;
+  disminucion: boolean;
 }
 
 export interface TrustData {
-  name: 'Perception of Insecurity' | 'Trust in Police';
+  name: 'Trust in Police';
   value: number;
+  region?: string;
+  year: number;
 }
 
 export interface ChatMessage {
