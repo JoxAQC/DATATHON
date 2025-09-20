@@ -115,7 +115,7 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
           {activeTab === 'map' && (
             <>
               <div>
-                <h3 className="font-headline text-lg text-primary/90">Historical Crime Trend</h3>
+                <h3 className="font-headline text-lg text-primary/90">Línea de tiempo del crimen</h3>
                 <Card className="h-48 w-full p-2 comic-panel">
                   <ChartContainer config={{crimes: {label: 'Crimes', color: 'hsl(var(--primary))'}}}>
                     <ResponsiveContainer>
@@ -132,12 +132,12 @@ function RegionDetails({ region, crimeDataByYear, trustData, genderViolenceData,
               </div>
 
               <div>
-                <h3 className="font-headline text-lg text-primary/90">AI Summary</h3>
+                <h3 className="font-headline text-lg text-primary/90">Resumen de la IA</h3>
                 <RegionSummary region={regionWithStats} />
               </div>
 
               <div>
-                 <h3 className="font-headline text-lg text-primary/90">Crime by Location (Latest Year)</h3>
+                 <h3 className="font-headline text-lg text-primary/90">Crimen por localidad (Último año)</h3>
                  <Card className="max-h-60 overflow-y-auto comic-panel">
                     <CardContent className="p-2">
                         {locationDetails.length > 0 ? (
@@ -351,7 +351,7 @@ export default function DashboardSidebar({
         {activeTab === 'map' && (
           <>
             <h3 className="font-headline text-xl text-primary/80 mb-2">
-              {selectedRegion ? 'Common Crimes' : 'Filter by Crime'}
+              {selectedRegion ? 'Crimenes comunes' : 'Filter by Crime'}
             </h3>
             <div className="grid grid-cols-2 gap-2 mb-4">
               {mostCommonCrimes.map((crime) => {
