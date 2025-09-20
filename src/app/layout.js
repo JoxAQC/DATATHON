@@ -1,0 +1,24 @@
+import { Toaster } from '@/components/ui/toaster';
+import './globals.css';
+
+// No need for 'Metadata' import as it's not being used here
+export const metadata = {
+  title: 'Adventure Awaits',
+  description: 'Your adventure is about to begin.',
+};
+
+export default function RootLayout({ children }) {
+  return (
+    <html lang="en">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Bangers&display=swap" rel="stylesheet" />
+      </head>
+      <body className="font-body antialiased">
+        {children}
+        <Toaster />
+      </body>
+    </html>
+  );
+}
